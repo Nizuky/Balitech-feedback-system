@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, sessio
 from sqlalchemy import func
 
 from app import db
-from models import Form, FormResponse, User
+from models import Form, FormResponse, User, Question, Feedback
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -35,6 +35,8 @@ def get_stats():
                 'users': User.query.count(),
                 'forms': Form.query.count(),
                 'responses': FormResponse.query.count(),
+                'feedback': Feedback.query.count(),
+                'questions': Question.query.count(),
             },
         }
     )
