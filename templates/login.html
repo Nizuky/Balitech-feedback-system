@@ -1,32 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Creator Login - Balitech Feedback System{% endblock %}
+{% block title %}Login - Balitech Feedback System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-body p-5">
-                <h2 class="card-title text-center mb-4">Balitech Feedback System</h2>
-                <h5 class="card-subtitle text-center mb-5 text-muted">Creator Login</h5>
-                
-                <form id="loginForm">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="row w-100">
+        <div class="col-md-5 col-lg-4 mx-auto">
+            <!-- Login Card -->
+            <div class="card" style="border: none; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h2 class="mb-2" style="color: var(--text-dark); font-weight: 700;">Balitech</h2>
+                        <h5 class="text-muted mb-3">Feedback System</h5>
+                        <p class="text-muted small">Login to create and manage your forms</p>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+
+                    <hr class="my-4">
+
+                    <!-- Login Form -->
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-500" style="color: var(--text-dark);">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required style="border-color: #e5e7eb;">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-500" style="color: var(--text-dark);">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required style="border-color: #e5e7eb;">
+                        </div>
+                        
+                        <!-- Alerts -->
+                        <div id="alertContainer" class="mb-3"></div>
+                        
+                        <!-- Login Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg fw-600">Login</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <!-- Footer -->
+                    <div class="text-center">
+                        <p class="text-muted mb-2">Don't have an account?</p>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-sm w-100">Create Account</a>
                     </div>
-                    
-                    <div id="alertContainer"></div>
-                    
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
-                </form>
-                
-                <p class="text-center text-muted">Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('forms.list_public_forms') }}" class="text-muted text-decoration-none small">← Back to Forms</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -41,37 +65,42 @@
         
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const alertContainer = document.getElementById('alertContainer');
         
         try {
             const response = await fetch('{{ url_for("auth.login") }}', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
 
-            const rawBody = await response.text();
-            let data;
-            try {
-                data = JSON.parse(rawBody);
-            } catch (_parseErr) {
-                data = { message: `Server returned non-JSON response (status ${response.status}).` };
-            }
-
-            const alertContainer = document.getElementById('alertContainer');
+            const data = await response.json();
             
             if (response.ok) {
-                alertContainer.innerHTML = `<div class="alert alert-success">Login successful! Redirecting...</div>`;
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        Login successful! Redirecting...
+                    </div>
+                `;
                 setTimeout(() => {
-                    window.location.href = data.redirect;
-                }, 1500);
+                    window.location.href = data.redirect || '{{ url_for("forms.list_public_forms") }}';
+                }, 1000);
             } else {
-                const errorMessage = data.message || `Login failed (HTTP ${response.status}).`;
-                alertContainer.innerHTML = `<div class="alert alert-danger">${errorMessage}</div>`;
+                const errorMessage = data.message || 'Login failed. Please try again.';
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> ${errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
             }
         } catch (error) {
-            document.getElementById('alertContainer').innerHTML = `<div class="alert alert-danger">Request failed: ${error.message}</div>`;
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> ${error.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
         }
     });
 </script>

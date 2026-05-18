@@ -1,59 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}{{ form.title }}{% endblock %}
-
-{% block extra_css %}
-<style>
-    .checkbox-option-label {
-        color: var(--text-light) !important;
-        font-weight: 500;
-    }
-</style>
-{% endblock %}
+{% block title %}{{ form.title }} - Balitech{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <h2>{{ form.title }}</h2>
-                <p class="text-muted">{{ form.description }}</p>
-
-                <div class="mb-3">
-                    <label class="form-label">Your name (optional)</label>
-                    <input type="text" id="respondentName" class="form-control" placeholder="Anonymous if empty">
-                </div>
-
-                <form id="publicForm">
-                    {% for q in form.questions %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Form Card -->
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-5">
                     <div class="mb-4">
-                        <label class="form-label">{{ loop.index }}. {{ q.label }} {% if q.required %}<span class="text-danger">*</span>{% endif %}</label>
-
-                        {% if q.question_type == 'text' %}
-                            <textarea class="form-control" data-qid="{{ q.id }}" rows="3"></textarea>
-                        {% elif q.question_type == 'multiple_choice' %}
-                            <select class="form-select" data-qid="{{ q.id }}">
-                                <option value="">-- Select --</option>
-                                {% for opt in q.options %}
-                                <option value="{{ opt.value }}">{{ opt.value }}</option>
-                                {% endfor %}
-                            </select>
-                        {% elif q.question_type == 'checkbox' %}
-                            <div>
-                                {% for opt in q.options %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" data-qid="{{ q.id }}" value="{{ opt.value }}" id="q{{ q.id }}o{{ loop.index }}">
-                                    <label class="form-check-label checkbox-option-label" for="q{{ q.id }}o{{ loop.index }}">{{ opt.value }}</label>
-                                </div>
-                                {% endfor %}
-                            </div>
+                        <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700;">{{ form.title }}</h1>
+                        {% if form.description %}
+                        <p class="text-muted">{{ form.description }}</p>
                         {% endif %}
                     </div>
-                    {% endfor %}
 
-                    <button type="submit" class="btn btn-primary w-100">Submit Response</button>
-                </form>
+                    <hr class="my-4">
+
+                    <!-- Respondent Name (Optional) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-500" style="color: var(--text-dark);">Your Name (Optional)</label>
+                        <input type="text" id="respondentName" class="form-control" placeholder="Leave blank to respond anonymously" style="border-color: #e5e7eb;">
+                        <small class="text-muted">Your responses will be recorded anonymously if you don't provide a name</small>
+                    </div>
+
+                    <!-- Form Questions -->
+                    <form id="publicForm" class="mt-5">
+                        {% for q in form.questions %}
+                        <div class="mb-5">
+                            <label class="form-label fw-600" style="color: var(--text-dark); font-size: 1.05rem;">
+                                {{ loop.index }}. {{ q.label }}
+                                {% if q.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+
+                            {% if q.question_type == 'text' %}
+                                <textarea class="form-control" data-qid="{{ q.id }}" rows="4" style="border-color: #e5e7eb;" placeholder="Enter your response here..."></textarea>
+
+                            {% elif q.question_type == 'multiple_choice' %}
+                                <select class="form-select" data-qid="{{ q.id }}" style="border-color: #e5e7eb;">
+                                    <option value="">-- Select an option --</option>
+                                    {% for opt in q.options %}
+                                    <option value="{{ opt.value }}">{{ opt.value }}</option>
+                                    {% endfor %}
+                                </select>
+
+                            {% elif q.question_type == 'checkbox' %}
+                                <div class="mt-2">
+                                    {% for opt in q.options %}
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" data-qid="{{ q.id }}" value="{{ opt.value }}" id="q{{ q.id }}o{{ loop.index }}">
+                                        <label class="form-check-label" for="q{{ q.id }}o{{ loop.index }}" style="color: var(--text-dark);">{{ opt.value }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg fw-600">Submit Response</button>
+                        </div>
+                    </form>
+                </div>
             </div>
+
+            <!-- Alert Container -->
+            <div id="alertContainer" class="mt-4"></div>
         </div>
     </div>
 </div>
@@ -66,10 +79,12 @@ document.getElementById('publicForm').addEventListener('submit', async (e) => {
 
     const answers = {};
 
+    // Collect text and select answers
     document.querySelectorAll('textarea[data-qid], select[data-qid]').forEach(el => {
         answers[el.dataset.qid] = el.value;
     });
 
+    // Collect checkbox answers
     const checkboxMap = {};
     document.querySelectorAll('input[type="checkbox"][data-qid]').forEach(el => {
         if (!checkboxMap[el.dataset.qid]) checkboxMap[el.dataset.qid] = [];
@@ -78,6 +93,56 @@ document.getElementById('publicForm').addEventListener('submit', async (e) => {
 
     Object.keys(checkboxMap).forEach(qid => {
         answers[qid] = checkboxMap[qid];
+    });
+
+    const payload = {
+        respondent_name: document.getElementById('respondentName').value || null,
+        answers: answers
+    };
+
+    try {
+        const response = await fetch('{{ url_for("forms.submit_form", public_id=form.public_id) }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Show success message
+            document.getElementById('alertContainer').innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Thank You!</strong> Your response has been recorded successfully.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.getElementById('publicForm').reset();
+            document.getElementById('respondentName').value = '';
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = '{{ url_for("forms.list_public_forms") }}';
+            }, 2000);
+        } else {
+            document.getElementById('alertContainer').innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> ${data.message || 'Failed to submit response'}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('alertContainer').innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong> ${error.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %}
     });
 
     const resp = await fetch('{{ url_for("forms.submit_form", public_id=form.public_id) }}', {

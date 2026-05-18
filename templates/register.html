@@ -1,37 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Balitech Feedback{% endblock %}
+{% block title %}Create Account - Balitech Feedback System{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-body p-5">
-                <h2 class="card-title text-center mb-4">Create Account</h2>
-                <h5 class="card-subtitle text-center mb-5 text-muted">Balitech Feedback System</h5>
-                
-                <form id="registerForm">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="row w-100">
+        <div class="col-md-5 col-lg-4 mx-auto">
+            <!-- Register Card -->
+            <div class="card" style="border: none; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                <div class="card-body p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h2 class="mb-2" style="color: var(--text-dark); font-weight: 700;">Create Account</h2>
+                        <p class="text-muted small">Join Balitech and create surveys</p>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+
+                    <hr class="my-4">
+
+                    <!-- Register Form -->
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-500" style="color: var(--text-dark);">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required style="border-color: #e5e7eb;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-500" style="color: var(--text-dark);">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required style="border-color: #e5e7eb;">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-500" style="color: var(--text-dark);">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required style="border-color: #e5e7eb;">
+                            <small class="text-muted">Minimum 6 characters</small>
+                        </div>
+                        
+                        <!-- Alerts -->
+                        <div id="alertContainer" class="mb-3"></div>
+                        
+                        <!-- Register Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg fw-600">Create Account</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <!-- Footer -->
+                    <div class="text-center">
+                        <p class="text-muted mb-2">Already have an account?</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm w-100">Sign In</a>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Password (min. 6 characters)</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('forms.list_public_forms') }}" class="text-muted text-decoration-none small">← Back to Forms</a>
                     </div>
-                    
-                    <div id="alertContainer"></div>
-                    
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
-                </form>
-                
-                <p class="text-center text-muted">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+                </div>
             </div>
         </div>
     </div>
@@ -47,29 +71,42 @@
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const alertContainer = document.getElementById('alertContainer');
         
         try {
             const response = await fetch('{{ url_for("auth.register") }}', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
             });
             
             const data = await response.json();
-            const alertContainer = document.getElementById('alertContainer');
             
             if (response.ok) {
-                alertContainer.innerHTML = `<div class="alert alert-success">${data.message} Redirecting to login...</div>`;
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        Account created successfully! Redirecting to login...
+                    </div>
+                `;
                 setTimeout(() => {
                     window.location.href = '{{ url_for("auth.login") }}';
-                }, 2000);
+                }, 1500);
             } else {
-                alertContainer.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                const errorMessage = data.message || 'Registration failed. Please try again.';
+                alertContainer.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> ${errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
             }
         } catch (error) {
-            document.getElementById('alertContainer').innerHTML = `<div class="alert alert-danger">An error occurred. Please try again.</div>`;
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> ${error.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
         }
     });
 </script>

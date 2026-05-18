@@ -1,36 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}Available Forms{% endblock %}
+{% block title %}Feedback Forms - Balitech{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-10 mx-auto">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Available Forms</h2>
-            <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-outline-light">Creator Dashboard</a>
-        </div>
+<div class="container-fluid py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700;">Available Forms</h1>
+                    <p class="text-muted">Fill out our feedback forms to help us improve</p>
+                </div>
+            </div>
 
-        {% if forms %}
-            <div class="row g-3">
-                {% for f in forms %}
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ f.title }}</h5>
-                            <p class="text-muted">{{ f.description or 'No description' }}</p>
-                            <a href="{{ url_for('forms.answer_form', public_id=f.public_id) }}" class="btn btn-primary">Open Form</a>
+            <!-- CTA Buttons -->
+            <div class="d-flex gap-2 flex-wrap mb-4">
+                {% if session.get('user_id') %}
+                    {% if session.get('role') == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-info">Admin Dashboard</a>
+                    {% else %}
+                        <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-info">My Forms</a>
+                    {% endif %}
+                    <a href="{{ url_for('forms.creator_new_form') }}" class="btn btn-success">+ Create New Form</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}?next=/forms" class="btn btn-info">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-info">Sign Up to Create Forms</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Forms Grid -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% if forms %}
+                <div class="row g-3">
+                    {% for f in forms %}
+                    <div class="col-md-6">
+                        <div class="card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s;">
+                            <div class="card-body p-4">
+                                <h5 class="card-title mb-2" style="color: var(--text-dark); font-weight: 600;">{{ f.title }}</h5>
+                                <p class="text-muted small mb-3">{{ f.description or 'No description provided' }}</p>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('forms.answer_form', public_id=f.public_id) }}" class="btn btn-primary btn-sm flex-grow-1">Open Form</a>
+                                    {% if session.get('user_id') and f.creator_id == session.get('user_id') %}
+                                    <a href="{{ url_for('forms.creator_new_form', form_id=f.id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="card">
-                <div class="card-body">
-                    <p class="text-muted mb-0">No published forms are available yet.</p>
+            {% else %}
+                <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                    <div class="card-body p-5 text-center">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-muted); opacity: 0.5;"></i>
+                        <p class="text-muted mt-3 mb-0">No published forms are available yet.</p>
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<style>
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important; }
+</style>
 {% endblock %}
