@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Balitech Feedback{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">Create Account</h2>
+                <h5 class="card-subtitle text-center mb-5 text-muted">Balitech Feedback System</h5>
+                
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Password (min. 6 characters)</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <div id="alertContainer"></div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
+                </form>
+                
+                <p class="text-center text-muted">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        try {
+            const response = await fetch('{{ url_for("auth.register") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password })
+            });
+            
+            const data = await response.json();
+            const alertContainer = document.getElementById('alertContainer');
+            
+            if (response.ok) {
+                alertContainer.innerHTML = `<div class="alert alert-success">${data.message} Redirecting to login...</div>`;
+                setTimeout(() => {
+                    window.location.href = '{{ url_for("auth.login") }}';
+                }, 2000);
+            } else {
+                alertContainer.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
+        } catch (error) {
+            document.getElementById('alertContainer').innerHTML = `<div class="alert alert-danger">An error occurred. Please try again.</div>`;
+        }
+    });
+</script>
+{% endblock %}

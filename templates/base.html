@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Balitech Feedback System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --bg-light: #fef3c7;
+            --bg-white: #ffffff;
+            --surface: #f9fafb;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+
+        p, span, li, td, th {
+            color: var(--text-dark);
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        .navbar {
+            background-color: var(--bg-white) !important;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-dark) !important;
+            font-size: 1.3rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            font-weight: 500;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+        
+        .card {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-body {
+            font-size: 0.99rem;
+            color: var(--text-dark);
+        }
+
+        button, input, select, textarea {
+            font-size: 1rem;
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--bg-white);
+            border-color: var(--border);
+            color: var(--text-dark);
+            border-radius: 6px;
+            padding: 0.7rem 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-white);
+            border-color: var(--primary);
+            color: var(--text-dark);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .nav-link, .nav-link strong {
+            color: var(--text-dark) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            color: var(--primary-dark);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.get('username') %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('forms.list_public_forms') }}">Balitech Feedback System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link">Welcome, <strong>{{ session.get('username') }}</strong></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('forms.list_public_forms') }}">Public Forms</a>
+                    </li>
+                    {% if session.get('role') in ['public_user', 'admin'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('forms.creator_dashboard') }}">Creator Dashboard</a>
+                    </li>
+                    {% endif %}
+                    {% if session.get('role') == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% if not session.get('username') %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('forms.list_public_forms') }}">Balitech Feedback System</a>
+            <div class="ms-auto d-flex gap-2">
+                <a class="btn btn-sm btn-outline-light" href="{{ url_for('auth.login') }}">Login</a>
+                <a class="btn btn-sm btn-primary" href="{{ url_for('auth.register') }}">Create Account</a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+    
+    <div class="container mt-5">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

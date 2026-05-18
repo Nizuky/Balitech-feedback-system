@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Balitech Dev & Testing Plan</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --card:     #22263a;
+      --border:   #2e3450;
+      --accent:   #6c8ef5;
+      --accent2:  #a78bfa;
+      --green:    #34d399;
+      --yellow:   #fbbf24;
+      --red:      #f87171;
+      --text:     #e2e8f0;
+      --muted:    #8892b0;
+      --radius:   10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.03em;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-dev    { background: var(--accent); }
+    .dot-test   { background: var(--green); }
+    .dot-review { background: var(--yellow); }
+    .dot-deploy { background: var(--red); }
+
+    .weeks {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .week-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .week-header {
+      padding: 1rem 1.5rem;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .week-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .week-dates {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .week-focus {
+      font-size: 0.78rem;
+      background: rgba(108,142,245,0.12);
+      color: var(--accent2);
+      border: 1px solid rgba(108,142,245,0.25);
+      border-radius: 20px;
+      padding: 0.2rem 0.75rem;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .day-card {
+      background: var(--surface);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .day-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .day-date {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .task {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    .task-dev    { background: rgba(108,142,245,0.15); color: #a5b8fc; border-left: 3px solid var(--accent); }
+    .task-test   { background: rgba(52,211,153,0.13);  color: #6ee7b7; border-left: 3px solid var(--green); }
+    .task-review { background: rgba(251,191,36,0.12);  color: #fcd34d; border-left: 3px solid var(--yellow); }
+    .task-deploy { background: rgba(248,113,113,0.13); color: #fca5a5; border-left: 3px solid var(--red); }
+
+    .weekend {
+      opacity: 0.45;
+    }
+
+    .weekend .day-label {
+      color: var(--muted);
+    }
+
+    .milestone {
+      margin: 0 1.5rem 1.25rem;
+      margin-top: 1.25rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .milestone-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .milestone-text h4 {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-bottom: 0.2rem;
+    }
+
+    .milestone-text p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4rem; }
+      .days-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Balitech Feedback System</h1>
+  <p>April 29 – May 13, 2026 &nbsp;·&nbsp; 3-Week Dev & Testing Plan</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot dot-dev"></div> Development</div>
+  <div class="legend-item"><div class="dot dot-test"></div> QA / Testing</div>
+  <div class="legend-item"><div class="dot dot-review"></div> Review / Documentation</div>
+  <div class="legend-item"><div class="dot dot-deploy"></div> Finalization / Submit</div>
+</div>
+
+<div class="weeks">
+
+  <div class="week-block">
+    <div class="week-header">
+      <h2>Week 1</h2>
+      <span class="week-dates">Apr 29 – May 3</span>
+      <span class="week-focus">Foundation & Architecture</span>
+    </div>
+    <div class="days-grid">
+
+      <div class="day-card">
+        <div class="day-label">Wednesday</div>
+        <div class="day-date">Apr 29</div>
+        <div class="task task-review">Team Kickoff & Roles Assignment</div>
+        <div class="task task-dev">Define SQLite/MySQL Schema (Users, Items, Feedback)</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Thursday</div>
+        <div class="day-date">Apr 30</div>
+        <div class="task task-dev">Init Python/Flask Environment</div>
+        <div class="task task-dev">Setup Flask App & Basic Routing</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Friday</div>
+        <div class="day-date">May 1</div>
+        <div class="task task-dev">Create Static HTML/CSS Shells</div>
+        <div class="task task-dev">Build Auth (Register/Login forms)</div>
+        <div class="task task-test">Test DB Connection & Password Hashing</div>
+      </div>
+
+      <div class="day-card weekend">
+        <div class="day-label">Saturday</div>
+        <div class="day-date">May 2</div>
+        <div class="task task-dev">Implement Session Middleware</div>
+      </div>
+
+      <div class="day-card weekend">
+        <div class="day-label">Sunday</div>
+        <div class="day-date">May 3</div>
+        <div class="task task-review">Code Review: Auth & Routing</div>
+      </div>
+
+    </div>
+    <div class="milestone">
+      <div class="milestone-icon">🚀</div>
+      <div class="milestone-text">
+        <h4>Week 1 Milestone</h4>
+        <p>Database schema is finalized. Users can successfully register, log in, and hit the basic Flask routes safely.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <h2>Week 2</h2>
+      <span class="week-dates">May 4 – May 10</span>
+      <span class="week-focus">Core Integration & REST API</span>
+    </div>
+    <div class="days-grid">
+
+      <div class="day-card">
+        <div class="day-label">Monday</div>
+        <div class="day-date">May 4</div>
+        <div class="task task-dev">Flask API: POST /api/feedback endpoint</div>
+        <div class="task task-dev">Backend JSON Parsing Logic</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Tuesday</div>
+        <div class="day-date">May 5</div>
+        <div class="task task-dev">Frontend: Capture inputs to JSON</div>
+        <div class="task task-dev">Frontend: JS Fetch API Integration</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Wednesday</div>
+        <div class="day-date">May 6</div>
+        <div class="task task-dev">Flask API: GET /api/admin/reports</div>
+        <div class="task task-dev">DB CRUD: SQL INSERT & SELECT</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Thursday</div>
+        <div class="day-date">May 7</div>
+        <div class="task task-dev">Admin UI: Dynamic JSON to HTML tables</div>
+        <div class="task task-test">Test End-to-End Feedback Flow</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Friday</div>
+        <div class="day-date">May 8</div>
+        <div class="task task-dev">Admin CRUD: Manage Menu Items</div>
+        <div class="task task-dev">Admin CRUD: Manage Dynamic Questions</div>
+      </div>
+
+      <div class="day-card weekend">
+        <div class="day-label">Saturday</div>
+        <div class="day-date">May 9</div>
+        <div class="task task-test">Integration testing on Admin CRUD</div>
+      </div>
+
+      <div class="day-card weekend">
+        <div class="day-label">Sunday</div>
+        <div class="day-date">May 10</div>
+        <div class="task task-review">UI/UX refinement</div>
+      </div>
+
+    </div>
+    <div class="milestone">
+      <div class="milestone-icon">⚙️</div>
+      <div class="milestone-text">
+        <h4>Week 2 Milestone</h4>
+        <p>Core client-server architecture is running. JSON data successfully flows from UI to Flask to DB. Admin management tools are integrated.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-block">
+    <div class="week-header">
+      <h2>Week 3</h2>
+      <span class="week-dates">May 11 – May 13</span>
+      <span class="week-focus">Testing, Documentation & Delivery</span>
+    </div>
+    <div class="days-grid">
+
+      <div class="day-card">
+        <div class="day-label">Monday</div>
+        <div class="day-date">May 11</div>
+        <div class="task task-dev">Implement robust JSON error handling</div>
+        <div class="task task-dev">Code refactoring & organization</div>
+        <div class="task task-test">Security QA: SQL Injection checks</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Tuesday</div>
+        <div class="day-date">May 12</div>
+        <div class="task task-test">Full QA System Cross-testing</div>
+        <div class="task task-review">Draft Architecture Explanation Doc</div>
+        <div class="task task-dev">Final UI/UX Polish</div>
+      </div>
+
+      <div class="day-card">
+        <div class="day-label">Wednesday</div>
+        <div class="day-date">May 13</div>
+        <div class="task task-review">Final code review</div>
+        <div class="task task-deploy">Prep submission package</div>
+        <div class="task task-deploy">Final Project Submission</div>
+      </div>
+
+    </div>
+    <div class="milestone">
+      <div class="milestone-icon">🏁</div>
+      <div class="milestone-text">
+        <h4>Week 3 Milestone — Delivery Day</h4>
+        <p>All requirements met, bugs squashed, architecture documented, and the Balitech Feedback System is submitted!</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Generated Apr 29, 2026 &nbsp;·&nbsp; Balitech 3-Week Sprint Plan
+</footer>
+
+</body>
+</html>

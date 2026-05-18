@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Creator Responses{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-11 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="mb-1">Form Responses</h2>
+                <p class="text-muted mb-0">Review submissions from forms you created.</p>
+            </div>
+            <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-outline-light">Back to My Forms</a>
+        </div>
+
+        {% if response_groups %}
+            {% for group in response_groups %}
+            <div class="card mb-4" id="form-{{ group.form.id }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                        <div>
+                            <h4 class="mb-1">{{ group.form.title }}</h4>
+                            <p class="text-muted mb-0">{{ group.form.description or 'No description' }}</p>
+                        </div>
+                        <span class="badge bg-secondary">{{ group.responses|length }} submission{{ 's' if group.responses|length != 1 else '' }}</span>
+                    </div>
+
+                    {% if group.responses %}
+                        <div class="vstack gap-3">
+                            {% for response in group.responses %}
+                            <div class="border rounded p-3" style="border-color: #2d3142 !important; color: var(--text-light);">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                                    <div>
+                                        <strong>{{ response.respondent_name if response.respondent_name else 'Anonymous' }}</strong>
+                                        <div class="text-muted small">Submitted {{ response.submitted_at.strftime('%Y-%m-%d %H:%M') if response.submitted_at else '' }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="vstack gap-2">
+                                    {% for answer in response.answers %}
+                                    <div class="p-2 rounded" style="background: #10131a; color: var(--text-light);">
+                                        <div class="fw-semibold" style="color: var(--text-light);">{{ loop.index }}. {{ answer.question }}</div>
+                                        <div class="text-muted small mb-1">{{ answer.type.replace('_', ' ').title() }}</div>
+                                        <div>
+                                            {% if answer.value is sequence and answer.value is not string %}
+                                                {{ answer.value | join(', ') }}
+                                            {% elif answer.value is not none and answer.value != '' %}
+                                                {{ answer.value }}
+                                            {% else %}
+                                                <span class="text-muted">No answer provided</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary mb-0">No submissions yet for this form.</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted mb-0">You have not created any forms yet.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Creator Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">My Forms</h2>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('forms.creator_responses_dashboard') }}" class="btn btn-outline-info">View Responses</a>
+                <a href="{{ url_for('forms.creator_new_form') }}" class="btn btn-primary">Create New Form</a>
+            </div>
+        </div>
+
+        {% if forms %}
+            <div class="row g-3">
+                {% for f in forms %}
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5>{{ f.title }}</h5>
+                            <p class="text-muted">{{ f.description or 'No description' }}</p>
+                            <p class="mb-1"><small>Status: {{ 'Published' if f.is_published else 'Draft' }}</small></p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{{ url_for('forms.answer_form', public_id=f.public_id) }}" class="btn btn-outline-light btn-sm">Open Public Form</a>
+                                <a href="{{ url_for('forms.creator_responses_dashboard') }}#form-{{ f.id }}" class="btn btn-outline-info btn-sm">Responses</a>
+                                <a href="{{ url_for('forms.creator_new_form', form_id=f.id) }}" class="btn btn-info btn-sm">Edit</a>
+                                <button class="btn btn-warning btn-sm" onclick="togglePublish({{ f.id }})">{{ 'Unpublish' if f.is_published else 'Publish' }}</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteForm({{ f.id }})">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted mb-0">You have not created any forms yet.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function togglePublish(formId) {
+    const response = await fetch(`{{ url_for('forms.creator_toggle_form', form_id=0) }}`.replace('0', formId), { method: 'POST' });
+    if (response.ok) window.location.reload();
+}
+
+async function deleteForm(formId) {
+    if (!confirm('Delete this form completely? This will remove all responses too.')) return;
+    const response = await fetch(`{{ url_for('forms.creator_delete_form', form_id=0) }}`.replace('0', formId), { method: 'POST' });
+    if (response.ok) window.location.reload();
+}
+</script>
+{% endblock %}

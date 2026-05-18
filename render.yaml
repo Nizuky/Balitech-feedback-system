@@ -1,0 +1,35 @@
+# Render Infrastructure-as-Code (Optional)
+# This file can be used to deploy the entire stack (web service + database) with one click.
+# 
+# Usage:
+# 1. Push this file to your GitHub repository
+# 2. In Render dashboard, click "New +" > "Blueprint"
+# 3. Connect your GitHub repo
+# 4. The services will be created automatically
+
+services:
+  - type: web
+    name: balitech-feedback
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python init_db_postgres.py
+    startCommand: gunicorn app:create_app()
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: balitech-db
+          property: connectionString
+    healthCheckPath: /
+    routes:
+      - path: /
+        matchType: prefix
+
+  - type: pserv
+    name: balitech-db
+    plan: free
+    databaseName: balitech_db
+    ipAllowList: [] # Allow all IPs (modify for security)

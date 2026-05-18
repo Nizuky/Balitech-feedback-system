@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Balitech{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">Admin Dashboard</h2>
+
+        <div class="row g-3 mb-4" id="statsCards">
+            <div class="col-md-4">
+                <div class="card"><div class="card-body"><h6 class="text-muted">Users</h6><h3 id="statUsers">-</h3></div></div>
+            </div>
+            <div class="col-md-4">
+                <div class="card"><div class="card-body"><h6 class="text-muted">Forms</h6><h3 id="statForms">-</h3></div></div>
+            </div>
+            <div class="col-md-4">
+                <div class="card"><div class="card-body"><h6 class="text-muted">Responses</h6><h3 id="statResponses">-</h3></div></div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">Manage Users</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="forms-tab" data-bs-toggle="tab" data-bs-target="#forms" type="button" role="tab">View Forms</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab">View Responses</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="users" role="tabpanel">
+                <div id="usersContainer" class="card"><div class="card-body"><p class="text-muted mb-0">Loading users...</p></div></div>
+            </div>
+            <div class="tab-pane fade" id="forms" role="tabpanel">
+                <div id="formsContainer" class="card"><div class="card-body"><p class="text-muted mb-0">Loading forms...</p></div></div>
+            </div>
+            <div class="tab-pane fade" id="responses" role="tabpanel">
+                <div id="responsesContainer" class="card"><div class="card-body"><p class="text-muted mb-0">Loading responses...</p></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+.nav-tabs { border-bottom-color: #2d3142; }
+.nav-tabs .nav-link { color: #8892b0; border-color: transparent; background-color: transparent; }
+.nav-tabs .nav-link.active { color: #ffffff; background-color: rgba(108, 142, 245, 0.15); border-color: #6c8ef5; border-bottom-color: #6c8ef5; }
+.table { color: #e2e8f0; }
+.table thead th { background: #0f1117; color: #ffffff; border-color: #2d3142; }
+.table td { border-color: #2d3142; }
+</style>
+<script>
+async function loadStats() {
+    const resp = await fetch('{{ url_for("admin.get_stats") }}');
+    const data = await resp.json();
+    if (data.status === 'success') {
+        document.getElementById('statUsers').textContent = data.stats.users;
+        document.getElementById('statForms').textContent = data.stats.forms;
+        document.getElementById('statResponses').textContent = data.stats.responses;
+    }
+}
+
+async function loadUsers() {
+    const resp = await fetch('{{ url_for("admin.get_users") }}');
+    const data = await resp.json();
+    if (data.status !== 'success') return;
+
+    let html = '<div class="card"><div class="card-body"><div class="table-responsive"><table class="table align-middle">';
+    html += '<thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Forms</th><th>Actions</th></tr></thead><tbody>';
+    data.users.forEach(u => {
+        html += `<tr>
+            <td>${u.username}</td>
+            <td>${u.email}</td>
+            <td>
+                <select class="form-select form-select-sm" id="role-${u.id}" style="max-width:150px;">
+                    <option value="public_user" ${u.role === 'public_user' ? 'selected' : ''}>Public User</option>
+                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                </select>
+            </td>
+            <td>${u.is_active ? 'Active' : 'Inactive'}</td>
+            <td>${u.form_count}</td>
+            <td>
+                <button class="btn btn-sm btn-success" onclick="saveUser(${u.id})">Save</button>
+                <button class="btn btn-sm ${u.is_active ? 'btn-warning' : 'btn-info'}" onclick="toggleUser(${u.id}, ${u.is_active})">${u.is_active ? 'Deactivate' : 'Activate'}</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table></div></div></div>';
+    document.getElementById('usersContainer').innerHTML = html;
+}
+
+async function saveUser(id) {
+    const role = document.getElementById(`role-${id}`).value;
+    const resp = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', id), {
+        method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ role })
+    });
+    if (resp.ok) { loadUsers(); }
+}
+
+async function toggleUser(id, isActive) {
+    const resp = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', id), {
+        method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ is_active: !isActive })
+    });
+    if (resp.ok) { loadUsers(); }
+}
+
+async function deleteUser(id) {
+    if (!confirm('Delete this user?')) return;
+    const resp = await fetch(`{{ url_for('admin.delete_user', user_id=0) }}`.replace('0', id), { method: 'DELETE' });
+    if (resp.ok) { loadUsers(); loadStats(); }
+}
+
+async function loadForms() {
+    const resp = await fetch('{{ url_for("admin.get_forms") }}');
+    const data = await resp.json();
+    if (data.status !== 'success') return;
+
+    let html = '<div class="card"><div class="card-body"><div class="table-responsive"><table class="table align-middle">';
+    html += '<thead><tr><th>Title</th><th>Creator</th><th>Published</th><th>Responses</th><th>Open</th><th>Actions</th></tr></thead><tbody>';
+    data.forms.forEach(f => {
+        html += `<tr>
+            <td>${f.title}</td>
+            <td>${f.creator_username}</td>
+            <td>${f.is_published ? 'Yes' : 'No'}</td>
+            <td>${f.response_count}</td>
+            <td><a class="btn btn-sm btn-outline-light" href="/forms/${f.public_id}" target="_blank">Open</a></td>
+            <td>
+                <button class="btn btn-sm ${f.is_published ? 'btn-warning' : 'btn-success'}" onclick="toggleFormPublish(${f.id}, ${f.is_published})">${f.is_published ? 'Unpublish' : 'Publish'}</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteForm(${f.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+    html += '</tbody></table></div></div></div>';
+    document.getElementById('formsContainer').innerHTML = html;
+}
+
+async function toggleFormPublish(id, published) {
+    const resp = await fetch(`{{ url_for('admin.update_form', form_id=0) }}`.replace('0', id), {
+        method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ is_published: !published })
+    });
+    if (resp.ok) { loadForms(); loadStats(); }
+}
+
+async function deleteForm(id) {
+    if (!confirm('Delete this form and its responses?')) return;
+    const resp = await fetch(`{{ url_for('admin.delete_form', form_id=0) }}`.replace('0', id), { method: 'DELETE' });
+    if (resp.ok) { loadForms(); loadStats(); }
+}
+
+async function loadResponses() {
+    const resp = await fetch('{{ url_for("admin.get_responses") }}');
+    const data = await resp.json();
+    if (data.status !== 'success') return;
+
+    let html = '<div class="card"><div class="card-body"><div class="table-responsive"><table class="table align-middle">';
+    html += '<thead><tr><th>ID</th><th>Form</th><th>Respondent</th><th>Submitted</th></tr></thead><tbody>';
+    data.responses.forEach(r => {
+        const dt = new Date(r.submitted_at).toLocaleString();
+        html += `<tr><td>${r.id}</td><td>${r.form_title}</td><td>${r.respondent}</td><td>${dt}</td></tr>`;
+    });
+    html += '</tbody></table></div></div></div>';
+    document.getElementById('responsesContainer').innerHTML = html;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadStats();
+    loadUsers();
+    loadForms();
+    loadResponses();
+    document.getElementById('users-tab').addEventListener('shown.bs.tab', loadUsers);
+    document.getElementById('forms-tab').addEventListener('shown.bs.tab', loadForms);
+    document.getElementById('responses-tab').addEventListener('shown.bs.tab', loadResponses);
+});
+</script>
+{% endblock %}

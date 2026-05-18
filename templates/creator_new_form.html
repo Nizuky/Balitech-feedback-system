@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form_data %}Edit Form{% else %}Create Form{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2>{% if form_data %}Edit Form{% else %}Create New Form{% endif %}</h2>
+                <p class="text-muted">Build a general-purpose survey form with text, multiple choice, and checkbox questions.</p>
+
+                <div class="mb-3">
+                    <label class="form-label">Form Title</label>
+                    <input id="formTitle" class="form-control" placeholder="e.g. Event Feedback">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea id="formDescription" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Questions</label>
+                    <div id="questionsBuilder"></div>
+                    <button id="addQuestionBtn" type="button" class="btn btn-outline-light mt-2">Add Question</button>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button id="saveFormBtn" class="btn btn-primary">{{ 'Save Changes' if form_data else 'Save Form' }}</button>
+                    <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .q-required-label {
+        color: var(--text-light) !important;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function makeQuestionBlock() {
+    const wrap = document.createElement('div');
+    wrap.className = 'border rounded p-3 mb-3';
+    wrap.style.borderColor = '#2d3142';
+    wrap.innerHTML = `
+        <div class="mb-2">
+            <label class="form-label">Question Label</label>
+            <input class="form-control q-label" placeholder="Type your question">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Type</label>
+            <select class="form-select q-type">
+                <option value="text">Text</option>
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="checkbox">Checkbox</option>
+            </select>
+        </div>
+        <div class="mb-2 q-options-wrap" style="display:none;">
+            <label class="form-label">Options (one per line)</label>
+            <textarea class="form-control q-options" rows="3" placeholder="Option A\nOption B"></textarea>
+        </div>
+        <div class="form-check mb-2">
+            <input class="form-check-input q-required" type="checkbox">
+            <label class="form-check-label q-required-label">Required</label>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger q-remove">Remove</button>
+    `;
+
+    const typeSel = wrap.querySelector('.q-type');
+    const optWrap = wrap.querySelector('.q-options-wrap');
+    typeSel.addEventListener('change', () => {
+        optWrap.style.display = ['multiple_choice', 'checkbox'].includes(typeSel.value) ? 'block' : 'none';
+    });
+
+    wrap.querySelector('.q-remove').addEventListener('click', () => wrap.remove());
+
+    return wrap;
+}
+
+const initialFormData = {{ form_data|tojson if form_data else 'null' }};
+const editUrl = {{ url_for('forms.creator_new_form', form_id=form_data.id) | tojson if form_data else 'null' }};
+
+function makeQuestionBlockFromData(question) {
+    const block = makeQuestionBlock();
+    block.querySelector('.q-label').value = question.label || '';
+    block.querySelector('.q-type').value = question.type || 'text';
+    block.querySelector('.q-required').checked = Boolean(question.required);
+    const optionsWrap = block.querySelector('.q-options-wrap');
+    if (['multiple_choice', 'checkbox'].includes(question.type)) {
+        optionsWrap.style.display = 'block';
+        block.querySelector('.q-options').value = (question.options || []).join('\n');
+    }
+    return block;
+}
+
+document.getElementById('addQuestionBtn').addEventListener('click', () => {
+    document.getElementById('questionsBuilder').appendChild(makeQuestionBlock());
+});
+
+document.getElementById('saveFormBtn').addEventListener('click', async () => {
+    const title = document.getElementById('formTitle').value.trim();
+    const description = document.getElementById('formDescription').value.trim();
+
+    const questions = Array.from(document.querySelectorAll('#questionsBuilder > div')).map(block => {
+        const type = block.querySelector('.q-type').value;
+        const optsRaw = block.querySelector('.q-options')?.value || '';
+        return {
+            label: block.querySelector('.q-label').value.trim(),
+            type,
+            required: block.querySelector('.q-required').checked,
+            options: optsRaw.split('\n').map(s => s.trim()).filter(Boolean)
+        };
+    });
+
+    const resp = await fetch(editUrl || '{{ url_for("forms.creator_new_form") }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            title,
+            description,
+            questions,
+            is_published: true
+        })
+    });
+
+    const data = await resp.json();
+    if (resp.ok) {
+        alert('Form created successfully');
+        window.location.href = '{{ url_for("forms.creator_dashboard") }}';
+    } else {
+        alert(data.message || 'Failed to create form');
+    }
+});
+
+// Seed editor with existing form data or a blank question block
+if (initialFormData) {
+    document.getElementById('formTitle').value = initialFormData.title || '';
+    document.getElementById('formDescription').value = initialFormData.description || '';
+    const builder = document.getElementById('questionsBuilder');
+    builder.innerHTML = '';
+    (initialFormData.questions || []).forEach(q => builder.appendChild(makeQuestionBlockFromData(q)));
+} else if (document.getElementById('questionsBuilder').children.length === 0) {
+    document.getElementById('questionsBuilder').appendChild(makeQuestionBlock());
+}
+</script>
+{% endblock %}

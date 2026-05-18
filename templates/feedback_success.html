@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Review Submitted - Balitech{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="text-center">
+        <div class="mb-4">
+            <svg class="mb-3" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#6c8ef5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        
+        <h2 class="mb-3" style="color: #ffffff;">Review Submitted Successfully!</h2>
+        <p class="mb-4" style="color: #c9cdd4; font-size: 1.1rem;">
+            Thank you for sharing your valuable feedback with us. Your review has been recorded and will help us improve our service.
+        </p>
+        
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{{ url_for('feedback.dashboard') }}" class="btn btn-primary btn-lg" style="background-color: #6c8ef5; border-color: #6c8ef5; color: #ffffff; padding: 0.75rem 2rem;">
+                Submit Another Review
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-lg" style="color: #c9cdd4; border-color: #2d3142; padding: 0.75rem 2rem;">
+                Exit / Logout
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

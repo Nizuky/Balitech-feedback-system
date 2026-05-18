@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Available Forms{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Available Forms</h2>
+            <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-outline-light">Creator Dashboard</a>
+        </div>
+
+        {% if forms %}
+            <div class="row g-3">
+                {% for f in forms %}
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ f.title }}</h5>
+                            <p class="text-muted">{{ f.description or 'No description' }}</p>
+                            <a href="{{ url_for('forms.answer_form', public_id=f.public_id) }}" class="btn btn-primary">Open Form</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted mb-0">No published forms are available yet.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ form.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkbox-option-label {
+        color: var(--text-light) !important;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h2>{{ form.title }}</h2>
+                <p class="text-muted">{{ form.description }}</p>
+
+                <div class="mb-3">
+                    <label class="form-label">Your name (optional)</label>
+                    <input type="text" id="respondentName" class="form-control" placeholder="Anonymous if empty">
+                </div>
+
+                <form id="publicForm">
+                    {% for q in form.questions %}
+                    <div class="mb-4">
+                        <label class="form-label">{{ loop.index }}. {{ q.label }} {% if q.required %}<span class="text-danger">*</span>{% endif %}</label>
+
+                        {% if q.question_type == 'text' %}
+                            <textarea class="form-control" data-qid="{{ q.id }}" rows="3"></textarea>
+                        {% elif q.question_type == 'multiple_choice' %}
+                            <select class="form-select" data-qid="{{ q.id }}">
+                                <option value="">-- Select --</option>
+                                {% for opt in q.options %}
+                                <option value="{{ opt.value }}">{{ opt.value }}</option>
+                                {% endfor %}
+                            </select>
+                        {% elif q.question_type == 'checkbox' %}
+                            <div>
+                                {% for opt in q.options %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" data-qid="{{ q.id }}" value="{{ opt.value }}" id="q{{ q.id }}o{{ loop.index }}">
+                                    <label class="form-check-label checkbox-option-label" for="q{{ q.id }}o{{ loop.index }}">{{ opt.value }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary w-100">Submit Response</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('publicForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const answers = {};
+
+    document.querySelectorAll('textarea[data-qid], select[data-qid]').forEach(el => {
+        answers[el.dataset.qid] = el.value;
+    });
+
+    const checkboxMap = {};
+    document.querySelectorAll('input[type="checkbox"][data-qid]').forEach(el => {
+        if (!checkboxMap[el.dataset.qid]) checkboxMap[el.dataset.qid] = [];
+        if (el.checked) checkboxMap[el.dataset.qid].push(el.value);
+    });
+
+    Object.keys(checkboxMap).forEach(qid => {
+        answers[qid] = checkboxMap[qid];
+    });
+
+    const resp = await fetch('{{ url_for("forms.submit_form", public_id=form.public_id) }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            respondent_name: document.getElementById('respondentName').value,
+            answers
+        })
+    });
+
+    const data = await resp.json();
+    if (resp.ok) {
+        alert('Response submitted successfully');
+        window.location.href = '{{ url_for("forms.list_public_forms") }}';
+    } else {
+        alert(data.message || 'Submission failed');
+    }
+});
+</script>
+{% endblock %}
