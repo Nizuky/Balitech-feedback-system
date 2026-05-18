@@ -4,16 +4,16 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
             <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700; font-size: 2rem;">System Management</h1>
-            <p class="text-muted mb-0">Manage users, forms, and survey responses</p>
+            <p class="text-muted mb-0">Manage users, questions, and survey responses</p>
         </div>
-        <button class="btn btn-primary" onclick="location.href='{{ url_for('dashboard') }}'">← Back to Feedback</button>
+        <button class="btn btn-primary" onclick="location.href='{{ url_for('dashboard') }}'">← Back to Survey</button>
     </div>
 
-    <!-- Stats Cards Row -->
+    <!-- Stats Cards -->
     <div class="row g-4 mb-5">
         <div class="col-sm-6 col-lg-3">
             <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
@@ -37,7 +37,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="text-muted small mb-1">Feedback Responses</p>
+                            <p class="text-muted small mb-1">Total Responses</p>
                             <h2 class="mb-2" id="statFeedback" style="color: #10b981; font-weight: 700;">-</h2>
                             <small class="text-muted"><span class="text-success">↑ 8%</span> from last month</small>
                         </div>
@@ -87,7 +87,7 @@
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs mb-4" role="tablist" style="border-bottom: 2px solid #e5e7eb;">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-600" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: var(--text-dark);">👥 Manage Users</button>
+            <button class="nav-link active fw-600" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: var(--text-dark);">👥 Users</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-600" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button" role="tab" style="color: var(--text-dark);">❓ Questions</button>
@@ -103,27 +103,20 @@
         <div class="tab-pane fade show active" id="users" role="tabpanel">
             <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">User Management</h5>
-                        <div class="d-flex gap-2">
-                            <input type="text" class="form-control form-control-sm" style="max-width: 300px;" placeholder="Search by name, email...">
-                            <button class="btn btn-sm btn-outline-secondary">Filter</button>
-                        </div>
-                    </div>
+                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">User Management</h5>
                     <div class="table-responsive">
                         <table class="table align-middle" style="color: var(--text-dark);">
                             <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
                                 <tr>
-                                    <th style="color: var(--text-dark); font-weight: 600;">User Name</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Username</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Email</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Role</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Status</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Forms</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="usersTable">
-                                <tr><td colspan="6" class="text-center text-muted py-5">Loading users...</td></tr>
+                                <tr><td colspan="5" class="text-center text-muted py-5">Loading users...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -158,17 +151,14 @@
         <div class="tab-pane fade" id="responses" role="tabpanel">
             <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">Survey Responses</h5>
-                        <button class="btn btn-sm btn-primary">Export Report</button>
-                    </div>
+                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Survey Responses</h5>
                     <div class="table-responsive">
                         <table class="table align-middle" style="color: var(--text-dark);">
                             <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
                                 <tr>
                                     <th style="color: var(--text-dark); font-weight: 600;">User</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Question</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Comment</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Response</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Date</th>
                                 </tr>
                             </thead>
@@ -280,33 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadResponses();
     document.getElementById('users-tab').addEventListener('shown.bs.tab', loadUsers);
     document.getElementById('questions-tab').addEventListener('shown.bs.tab', loadQuestions);
-    document.getElementById('responses-tab').addEventListener('shown.bs.tab', loadResponses);
-});
-</script>
-{% endblock %}
-
-async function loadResponses() {
-    const resp = await fetch('{{ url_for("admin.get_responses") }}');
-    const data = await resp.json();
-    if (data.status !== 'success') return;
-
-    let html = '<div class="card"><div class="card-body"><div class="table-responsive"><table class="table align-middle">';
-    html += '<thead><tr><th>ID</th><th>Form</th><th>Respondent</th><th>Submitted</th></tr></thead><tbody>';
-    data.responses.forEach(r => {
-        const dt = new Date(r.submitted_at).toLocaleString();
-        html += `<tr><td>${r.id}</td><td>${r.form_title}</td><td>${r.respondent}</td><td>${dt}</td></tr>`;
-    });
-    html += '</tbody></table></div></div></div>';
-    document.getElementById('responsesContainer').innerHTML = html;
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    loadStats();
-    loadUsers();
-    loadForms();
-    loadResponses();
-    document.getElementById('users-tab').addEventListener('shown.bs.tab', loadUsers);
-    document.getElementById('forms-tab').addEventListener('shown.bs.tab', loadForms);
     document.getElementById('responses-tab').addEventListener('shown.bs.tab', loadResponses);
 });
 </script>
