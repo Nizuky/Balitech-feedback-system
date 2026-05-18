@@ -131,12 +131,35 @@
             </div>
         </div>
 
-        <!-- Feedback Tab -->
-        <div class="tab-pane fade" id="feedback" role="tabpanel">
+        <!-- Questions Tab -->
+        <div class="tab-pane fade" id="questions" role="tabpanel">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-4">
+                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Survey Questions</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle" style="color: var(--text-dark);">
+                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <tr>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Question</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Responses</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="questionsTable">
+                                <tr><td colspan="3" class="text-center text-muted py-5">Loading questions...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responses Tab -->
+        <div class="tab-pane fade" id="responses" role="tabpanel">
             <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">Recent Feedback Responses</h5>
+                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">Survey Responses</h5>
                         <button class="btn btn-sm btn-primary">Export Report</button>
                     </div>
                     <div class="table-responsive">
@@ -147,39 +170,10 @@
                                     <th style="color: var(--text-dark); font-weight: 600;">Question</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Comment</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Date</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="feedbackTable">
-                                <tr><td colspan="5" class="text-center text-muted py-5">Loading feedback...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Topics Tab -->
-        <div class="tab-pane fade" id="topics" role="tabpanel">
-            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">Topics & Items</h5>
-                        <button class="btn btn-sm btn-primary">+ Add Topic</button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table align-middle" style="color: var(--text-dark);">
-                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
-                                <tr>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Topic Name</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Description</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Responses</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Status</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="topicsTable">
-                                <tr><td colspan="5" class="text-center text-muted py-5">Loading topics...</td></tr>
+                            <tbody id="responsesTable">
+                                <tr><td colspan="4" class="text-center text-muted py-5">Loading responses...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -192,111 +186,104 @@
 
 {% block extra_js %}
 <style>
-.nav-tabs { border-bottom-color: #2d3142; }
-.nav-tabs .nav-link { color: #8892b0; border-color: transparent; background-color: transparent; }
-.nav-tabs .nav-link.active { color: #ffffff; background-color: rgba(108, 142, 245, 0.15); border-color: #6c8ef5; border-bottom-color: #6c8ef5; }
-.table { color: #e2e8f0; }
-.table thead th { background: #0f1117; color: #ffffff; border-color: #2d3142; }
-.table td { border-color: #2d3142; }
+    .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important; }
+    .nav-tabs .nav-link { border: none; border-bottom: 3px solid transparent; color: var(--text-muted); transition: all 0.2s; }
+    .nav-tabs .nav-link:hover { border-bottom-color: var(--primary); color: var(--primary); }
+    .nav-tabs .nav-link.active { border-bottom-color: var(--primary); color: var(--primary); background: none; }
 </style>
+
 <script>
 async function loadStats() {
-    const resp = await fetch('{{ url_for("admin.get_stats") }}');
-    const data = await resp.json();
-    if (data.status === 'success') {
-        document.getElementById('statUsers').textContent = data.stats.users;
-        document.getElementById('statForms').textContent = data.stats.forms;
-        document.getElementById('statResponses').textContent = data.stats.responses;
-    }
+    try {
+        const response = await fetch('{{ url_for("admin.get_stats") }}');
+        const data = await response.json();
+        if (data.status === 'success') {
+            document.getElementById('statUsers').textContent = data.stats.users || 0;
+            document.getElementById('statFeedback').textContent = data.stats.feedback || 0;
+            document.getElementById('statForms').textContent = data.stats.forms || 0;
+            document.getElementById('statQuestions').textContent = data.stats.questions || 0;
+        }
+    } catch (error) { console.error('Error loading stats:', error); }
 }
 
 async function loadUsers() {
-    const resp = await fetch('{{ url_for("admin.get_users") }}');
-    const data = await resp.json();
-    if (data.status !== 'success') return;
-
-    let html = '<div class="card"><div class="card-body"><div class="table-responsive"><table class="table align-middle">';
-    html += '<thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Forms</th><th>Actions</th></tr></thead><tbody>';
-    data.users.forEach(u => {
-        html += `<tr>
-            <td>${u.username}</td>
-            <td>${u.email}</td>
-            <td>
-                <select class="form-select form-select-sm" id="role-${u.id}" style="max-width:150px;">
-                    <option value="public_user" ${u.role === 'public_user' ? 'selected' : ''}>Public User</option>
-                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-                </select>
-            </td>
-            <td>${u.is_active ? 'Active' : 'Inactive'}</td>
-            <td>${u.form_count}</td>
-            <td>
-                <button class="btn btn-sm btn-success" onclick="saveUser(${u.id})">Save</button>
-                <button class="btn btn-sm ${u.is_active ? 'btn-warning' : 'btn-info'}" onclick="toggleUser(${u.id}, ${u.is_active})">${u.is_active ? 'Deactivate' : 'Activate'}</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
-            </td>
-        </tr>`;
-    });
-    html += '</tbody></table></div></div></div>';
-    document.getElementById('usersContainer').innerHTML = html;
+    try {
+        const response = await fetch('{{ url_for("admin.get_users") }}');
+        const data = await response.json();
+        if (data.status !== 'success') return;
+        
+        const tbody = document.getElementById('usersTable');
+        tbody.innerHTML = '';
+        if (data.users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-5">No users found</td></tr>';
+            return;
+        }
+        
+        data.users.forEach(user => {
+            const statusBadge = user.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
+            const roleBadge = user.role === 'admin' ? '<span class="badge bg-primary">Admin</span>' : '<span class="badge bg-secondary">User</span>';
+            const row = `<tr><td><strong>${user.username}</strong></td><td>${user.email}</td><td>${roleBadge}</td><td>${statusBadge}</td><td><button class="btn btn-sm btn-outline-primary">Edit</button></td></tr>`;
+            tbody.innerHTML += row;
+        });
+    } catch (error) { console.error('Error loading users:', error); }
 }
 
-async function saveUser(id) {
-    const role = document.getElementById(`role-${id}`).value;
-    const resp = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', id), {
-        method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ role })
-    });
-    if (resp.ok) { loadUsers(); }
+async function loadQuestions() {
+    try {
+        const response = await fetch('{{ url_for("feedback.get_overall_questions") }}');
+        const data = await response.json();
+        if (data.status !== 'success') return;
+        
+        const tbody = document.getElementById('questionsTable');
+        tbody.innerHTML = '';
+        if (!data.questions || data.questions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-5">No questions found</td></tr>';
+            return;
+        }
+        
+        data.questions.forEach(q => {
+            const row = `<tr><td><strong>${q.text}</strong></td><td><span class="badge bg-info">View</span></td><td><button class="btn btn-sm btn-outline-danger">Delete</button></td></tr>`;
+            tbody.innerHTML += row;
+        });
+    } catch (error) { console.error('Error loading questions:', error); }
 }
 
-async function toggleUser(id, isActive) {
-    const resp = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', id), {
-        method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ is_active: !isActive })
-    });
-    if (resp.ok) { loadUsers(); }
+async function loadResponses() {
+    try {
+        const response = await fetch('{{ url_for("feedback.menu_summaries") }}');
+        const data = await response.json();
+        if (data.status !== 'success') return;
+        
+        const tbody = document.getElementById('responsesTable');
+        tbody.innerHTML = '';
+        if (!data.items || data.items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-5">No responses yet</td></tr>';
+            return;
+        }
+        
+        let count = 0;
+        data.items.forEach(item => {
+            for (let i = 0; i < item.response_count; i++) {
+                count++;
+                const row = `<tr><td><span class="badge bg-secondary">User ${count}</span></td><td>Survey Question</td><td><small>Comment</small></td><td>${new Date().toLocaleDateString()}</td></tr>`;
+                tbody.innerHTML += row;
+            }
+        });
+    } catch (error) { console.error('Error loading responses:', error); }
 }
 
-async function deleteUser(id) {
-    if (!confirm('Delete this user?')) return;
-    const resp = await fetch(`{{ url_for('admin.delete_user', user_id=0) }}`.replace('0', id), { method: 'DELETE' });
-    if (resp.ok) { loadUsers(); loadStats(); }
-}
-
-async function loadForms() {
-    const resp = await fetch('{{ url_for("admin.get_forms") }}');
-    const data = await resp.json();
-    if (data.status !== 'success') return;
-
-    let html = '<div class="card"><div class="card-body"><div class="table-responsive"><table class="table align-middle">';
-    html += '<thead><tr><th>Title</th><th>Creator</th><th>Published</th><th>Responses</th><th>Open</th><th>Actions</th></tr></thead><tbody>';
-    data.forms.forEach(f => {
-        html += `<tr>
-            <td>${f.title}</td>
-            <td>${f.creator_username}</td>
-            <td>${f.is_published ? 'Yes' : 'No'}</td>
-            <td>${f.response_count}</td>
-            <td><a class="btn btn-sm btn-outline-light" href="/forms/${f.public_id}" target="_blank">Open</a></td>
-            <td>
-                <button class="btn btn-sm ${f.is_published ? 'btn-warning' : 'btn-success'}" onclick="toggleFormPublish(${f.id}, ${f.is_published})">${f.is_published ? 'Unpublish' : 'Publish'}</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteForm(${f.id})">Delete</button>
-            </td>
-        </tr>`;
-    });
-    html += '</tbody></table></div></div></div>';
-    document.getElementById('formsContainer').innerHTML = html;
-}
-
-async function toggleFormPublish(id, published) {
-    const resp = await fetch(`{{ url_for('admin.update_form', form_id=0) }}`.replace('0', id), {
-        method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ is_published: !published })
-    });
-    if (resp.ok) { loadForms(); loadStats(); }
-}
-
-async function deleteForm(id) {
-    if (!confirm('Delete this form and its responses?')) return;
-    const resp = await fetch(`{{ url_for('admin.delete_form', form_id=0) }}`.replace('0', id), { method: 'DELETE' });
-    if (resp.ok) { loadForms(); loadStats(); }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    loadStats();
+    loadUsers();
+    loadQuestions();
+    loadResponses();
+    document.getElementById('users-tab').addEventListener('shown.bs.tab', loadUsers);
+    document.getElementById('questions-tab').addEventListener('shown.bs.tab', loadQuestions);
+    document.getElementById('responses-tab').addEventListener('shown.bs.tab', loadResponses);
+});
+</script>
+{% endblock %}
 
 async function loadResponses() {
     const resp = await fetch('{{ url_for("admin.get_responses") }}');
