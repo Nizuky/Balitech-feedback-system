@@ -3,43 +3,187 @@
 {% block title %}Admin Dashboard - Balitech{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h2 class="mb-4">Admin Dashboard</h2>
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700; font-size: 2rem;">System Management</h1>
+            <p class="text-muted mb-0">Monitor feedback, users, and form submissions</p>
+        </div>
+        <button class="btn btn-primary" onclick="location.href='{{ url_for('dashboard') }}'">← Back to Feedback</button>
+    </div>
 
-        <div class="row g-3 mb-4" id="statsCards">
-            <div class="col-md-4">
-                <div class="card"><div class="card-body"><h6 class="text-muted">Users</h6><h3 id="statUsers">-</h3></div></div>
-            </div>
-            <div class="col-md-4">
-                <div class="card"><div class="card-body"><h6 class="text-muted">Forms</h6><h3 id="statForms">-</h3></div></div>
-            </div>
-            <div class="col-md-4">
-                <div class="card"><div class="card-body"><h6 class="text-muted">Responses</h6><h3 id="statResponses">-</h3></div></div>
+    <!-- Stats Cards Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1">Total Users</p>
+                            <h2 class="mb-2" id="statUsers" style="color: var(--primary); font-weight: 700;">-</h2>
+                            <small class="text-muted"><span class="text-success">↑ 12%</span> from last month</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-people" style="font-size: 1.5rem; color: var(--primary);"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <ul class="nav nav-tabs mb-4" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">Manage Users</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="forms-tab" data-bs-toggle="tab" data-bs-target="#forms" type="button" role="tab">View Forms</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab">View Responses</button>
-            </li>
-        </ul>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1">Feedback Responses</p>
+                            <h2 class="mb-2" id="statFeedback" style="color: #10b981; font-weight: 700;">-</h2>
+                            <small class="text-muted"><span class="text-success">↑ 8%</span> from last month</small>
+                        </div>
+                        <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1);">
+                            <i class="bi bi-chat-dots" style="font-size: 1.5rem; color: #10b981;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="users" role="tabpanel">
-                <div id="usersContainer" class="card"><div class="card-body"><p class="text-muted mb-0">Loading users...</p></div></div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1">Forms Created</p>
+                            <h2 class="mb-2" id="statForms" style="color: #f59e0b; font-weight: 700;">-</h2>
+                            <small class="text-muted"><span class="text-success">↑ 4%</span> from last month</small>
+                        </div>
+                        <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(245, 158, 11, 0.1);">
+                            <i class="bi bi-file-text" style="font-size: 1.5rem; color: #f59e0b;"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="tab-pane fade" id="forms" role="tabpanel">
-                <div id="formsContainer" class="card"><div class="card-body"><p class="text-muted mb-0">Loading forms...</p></div></div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted small mb-1">Active Topics</p>
+                            <h2 class="mb-2" id="statTopics" style="color: #8b5cf6; font-weight: 700;">-</h2>
+                            <small class="text-muted"><span class="text-danger">↓ 2%</span> from last month</small>
+                        </div>
+                        <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(139, 92, 246, 0.1);">
+                            <i class="bi bi-tag" style="font-size: 1.5rem; color: #8b5cf6;"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="tab-pane fade" id="responses" role="tabpanel">
-                <div id="responsesContainer" class="card"><div class="card-body"><p class="text-muted mb-0">Loading responses...</p></div></div>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" role="tablist" style="border-bottom: 2px solid #e5e7eb;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-600" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: var(--text-dark);">👥 Manage Users</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-600" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" style="color: var(--text-dark);">💬 Feedback Responses</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-600" id="topics-tab" data-bs-toggle="tab" data-bs-target="#topics" type="button" role="tab" style="color: var(--text-dark);">📋 Topics</button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">User Management</h5>
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control form-control-sm" style="max-width: 300px;" placeholder="Search by name, email...">
+                            <button class="btn btn-sm btn-outline-secondary">Filter</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle" style="color: var(--text-dark);">
+                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <tr>
+                                    <th style="color: var(--text-dark); font-weight: 600;">User Name</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Email</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Role</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Status</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Forms</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr><td colspan="6" class="text-center text-muted py-5">Loading users...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Tab -->
+        <div class="tab-pane fade" id="feedback" role="tabpanel">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">Recent Feedback Responses</h5>
+                        <button class="btn btn-sm btn-primary">Export Report</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle" style="color: var(--text-dark);">
+                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <tr>
+                                    <th style="color: var(--text-dark); font-weight: 600;">User</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Question</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Comment</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Date</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbackTable">
+                                <tr><td colspan="5" class="text-center text-muted py-5">Loading feedback...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topics Tab -->
+        <div class="tab-pane fade" id="topics" role="tabpanel">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0" style="color: var(--text-dark); font-weight: 600;">Topics & Items</h5>
+                        <button class="btn btn-sm btn-primary">+ Add Topic</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle" style="color: var(--text-dark);">
+                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <tr>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Topic Name</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Description</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Responses</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Status</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topicsTable">
+                                <tr><td colspan="5" class="text-center text-muted py-5">Loading topics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
