@@ -8,7 +8,7 @@
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
             <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700; font-size: 2rem;">System Management</h1>
-            <p class="text-muted mb-0">Monitor feedback, users, and form submissions</p>
+            <p class="text-muted mb-0">Manage users, forms, and survey responses</p>
         </div>
         <button class="btn btn-primary" onclick="location.href='{{ url_for('dashboard') }}'">← Back to Feedback</button>
     </div>
@@ -71,12 +71,12 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="text-muted small mb-1">Active Topics</p>
-                            <h2 class="mb-2" id="statTopics" style="color: #8b5cf6; font-weight: 700;">-</h2>
-                            <small class="text-muted"><span class="text-danger">↓ 2%</span> from last month</small>
+                            <p class="text-muted small mb-1">Questions</p>
+                            <h2 class="mb-2" id="statQuestions" style="color: #8b5cf6; font-weight: 700;">-</h2>
+                            <small class="text-muted"><span class="text-success">↑ 2%</span> from last month</small>
                         </div>
                         <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(139, 92, 246, 0.1);">
-                            <i class="bi bi-tag" style="font-size: 1.5rem; color: #8b5cf6;"></i>
+                            <i class="bi bi-help-circle" style="font-size: 1.5rem; color: #8b5cf6;"></i>
                         </div>
                     </div>
                 </div>
@@ -90,10 +90,10 @@
             <button class="nav-link active fw-600" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: var(--text-dark);">👥 Manage Users</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-600" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" style="color: var(--text-dark);">💬 Feedback Responses</button>
+            <button class="nav-link fw-600" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button" role="tab" style="color: var(--text-dark);">❓ Questions</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-600" id="topics-tab" data-bs-toggle="tab" data-bs-target="#topics" type="button" role="tab" style="color: var(--text-dark);">📋 Topics</button>
+            <button class="nav-link fw-600" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab" style="color: var(--text-dark);">📊 Responses</button>
         </li>
     </ul>
 
