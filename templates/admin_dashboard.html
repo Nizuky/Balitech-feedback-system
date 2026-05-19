@@ -266,6 +266,7 @@ function toggleUser(userId, isActive) {
                 const data = await response.json();
                 if (response.ok) {
                     loadUsers();
+                    loadStats();
                     showToast('Success', `User account has been successfully ${isActive ? 'activated' : 'deactivated'}.`, 'success');
                 } else {
                     showToast('Error', data.message || 'Error updating user', 'danger');
@@ -289,6 +290,7 @@ function deleteUser(userId) {
                 const data = await response.json();
                 if (response.ok) {
                     loadUsers();
+                    loadStats();
                     showToast('Success', 'User has been successfully deleted.', 'success');
                 } else {
                     showToast('Error', data.message || 'Error deleting user', 'danger');
@@ -307,8 +309,19 @@ function deleteAdminForm(formId) {
         'Delete',
         'danger',
         async () => {
-            const response = await fetch(`{{ url_for('admin.delete_form', form_id=0) }}`.replace('0', formId), { method: 'DELETE' });
-            if (response.ok) loadForms();
+            try {
+                const response = await fetch(`{{ url_for('admin.delete_form', form_id=0) }}`.replace('0', formId), { method: 'DELETE' });
+                const data = await response.json();
+                if (response.ok) {
+                    loadForms();
+                    loadStats();
+                    showToast('Success', 'Form has been successfully deleted.', 'success');
+                } else {
+                    showToast('Error', data.message || 'Error deleting form', 'danger');
+                }
+            } catch (err) {
+                showToast('Error', 'An unexpected network error occurred.', 'danger');
+            }
         }
     );
 }
@@ -411,6 +424,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('users-tab').addEventListener('shown.bs.tab', loadUsers);
     document.getElementById('forms-tab').addEventListener('shown.bs.tab', loadForms);
     document.getElementById('responses-tab').addEventListener('shown.bs.tab', loadResponses);
+
+    // Live update stats and responses in the background (every 10 and 15 seconds)
+    setInterval(loadStats, 10000);
+    setInterval(loadResponses, 15000);
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
