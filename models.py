@@ -87,6 +87,7 @@ class Form(db.Model):
     closes_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    tag = db.Column(db.String(255), nullable=True)
 
     creator = db.relationship('User', backref=db.backref('created_forms', lazy=True))
     questions = db.relationship('FormQuestion', backref='form', lazy=True, cascade='all, delete-orphan', order_by='FormQuestion.position')

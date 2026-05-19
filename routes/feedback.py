@@ -13,13 +13,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@feedback_bp.route('/dashboard')
-@login_required
-def dashboard():
-    """User dashboard - main feedback submission page."""
-    menu_items = MenuItem.query.all()
-    overall_questions = Question.query.filter_by(menu_item_id=None).all()
-    return render_template('dashboard.html', menu_items=menu_items, overall_questions=overall_questions)
 
 @feedback_bp.route('/success')
 @login_required

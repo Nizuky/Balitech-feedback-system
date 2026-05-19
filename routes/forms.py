@@ -16,7 +16,9 @@ def creator_required(f):
     def decorated(*args, **kwargs):
         if 'user_id' not in session:
             return redirect(url_for('auth.login'))
-        if session.get('role') not in ['user', 'admin', 'public_user']:
+        if session.get('role') == 'admin':
+            return redirect(url_for('admin.dashboard'))
+        if session.get('role') not in ['user', 'public_user']:
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated
@@ -24,7 +26,10 @@ def creator_required(f):
 
 @forms_bp.route('/forms')
 def list_public_forms():
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin.dashboard'))
     now = datetime.utcnow()
+    q = (request.args.get('q') or '').strip().lower()
     forms = Form.query.filter(Form.is_published.is_(True)).all()
 
     visible = []
@@ -33,15 +38,25 @@ def list_public_forms():
             continue
         if f.closes_at and f.closes_at < now:
             continue
+        if q:
+            searchable = ' '.join(filter(None, [f.title, f.description, f.tag])).lower()
+            if q not in searchable:
+                continue
         visible.append(f)
 
-    return render_template('forms_public_list.html', forms=visible)
+    return render_template('forms_public_list.html', forms=visible, search_query=q)
 
 
 @forms_bp.route('/forms/<string:public_id>')
 def answer_form(public_id):
     form = Form.query.filter_by(public_id=public_id, is_published=True).first_or_404()
     return render_template('form_answer.html', form=form)
+
+
+@forms_bp.route('/forms/<string:public_id>/thank_you')
+def thank_you(public_id):
+    form = Form.query.filter_by(public_id=public_id, is_published=True).first_or_404()
+    return render_template('form_thank_you.html', form=form)
 
 
 @forms_bp.route('/forms/<string:public_id>/submit', methods=['POST'])
@@ -73,6 +88,8 @@ def submit_form(public_id):
             continue
 
         if q.question_type == 'text':
+            answer.value_text = str(raw)
+        elif q.question_type == 'rating':
             answer.value_text = str(raw)
         elif q.question_type in ['dropdown', 'multiple_choice']:
             answer.value_choice = str(raw)
@@ -134,9 +151,28 @@ def creator_responses_dashboard():
                 'answers': answers,
             })
 
+        # Compute average ratings for star-rating questions
+        rating_averages = {}
+        for q in form.questions:
+            if q.question_type == 'rating':
+                vals = []
+                for ans in q.answers:
+                    try:
+                        v = int(ans.value_text)
+                        if 1 <= v <= 5:
+                            vals.append(v)
+                    except (TypeError, ValueError):
+                        pass
+                if vals:
+                    rating_averages[q.id] = {
+                        'avg': round(sum(vals) / len(vals), 1),
+                        'count': len(vals)
+                    }
+
         response_groups.append({
             'form': form,
             'responses': grouped_responses,
+            'rating_averages': rating_averages,
         })
 
     return render_template('creator_responses_dashboard.html', response_groups=response_groups)
@@ -151,6 +187,7 @@ def _serialize_form(form):
         'is_published': bool(form.is_published),
         'opens_at': form.opens_at.isoformat() if form.opens_at else '',
         'closes_at': form.closes_at.isoformat() if form.closes_at else '',
+        'tag': form.tag or '',
         'questions': [
             {
                 'id': q.id,
@@ -180,6 +217,7 @@ def creator_new_form(form_id=None):
     title = (data.get('title') or '').strip()
     description = (data.get('description') or '').strip()
     questions = data.get('questions') or []
+    tag = (data.get('tag') or '').strip()
 
     if not title:
         return jsonify({'status': 'error', 'message': 'Form title is required'}), 400
@@ -192,6 +230,7 @@ def creator_new_form(form_id=None):
             public_id=secrets.token_urlsafe(8),
             title=title,
             description=description,
+            tag=tag or None,
             creator_id=session['user_id'],
             is_published=bool(data.get('is_published', True))
         )
@@ -200,6 +239,7 @@ def creator_new_form(form_id=None):
     else:
         form.title = title
         form.description = description
+        form.tag = tag or None
         form.is_published = bool(data.get('is_published', form.is_published))
 
     opens_at = data.get('opens_at')
@@ -215,7 +255,7 @@ def creator_new_form(form_id=None):
 
     for idx, q in enumerate(questions):
         q_type = q.get('type')
-        if q_type not in ['text', 'multiple_choice', 'checkbox']:
+        if q_type not in ['text', 'multiple_choice', 'checkbox', 'rating']:
             db.session.rollback()
             return jsonify({'status': 'error', 'message': f'Unsupported question type: {q_type}'}), 400
 
@@ -272,3 +312,43 @@ def creator_toggle_form(form_id):
     form.is_published = not bool(form.is_published)
     db.session.commit()
     return jsonify({'status': 'success', 'is_published': bool(form.is_published)})
+
+
+@forms_bp.route('/creator/forms/<int:form_id>/duplicate', methods=['POST'])
+@creator_required
+def creator_duplicate_form(form_id):
+    form = Form.query.filter_by(id=form_id, creator_id=session['user_id']).first_or_404()
+    
+    new_form = Form(
+        public_id=secrets.token_urlsafe(8),
+        title=f"Copy of {form.title}",
+        description=form.description,
+        creator_id=session['user_id'],
+        is_published=False,
+        opens_at=form.opens_at,
+        closes_at=form.closes_at
+    )
+    db.session.add(new_form)
+    db.session.flush()
+
+    for q in form.questions:
+        new_q = FormQuestion(
+            form_id=new_form.id,
+            label=q.label,
+            question_type=q.question_type,
+            required=q.required,
+            position=q.position
+        )
+        db.session.add(new_q)
+        db.session.flush()
+        
+        for opt in q.options:
+            new_opt = FormOption(
+                question_id=new_q.id,
+                value=opt.value,
+                position=opt.position
+            )
+            db.session.add(new_opt)
+
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Form duplicated'})

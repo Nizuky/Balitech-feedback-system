@@ -5,24 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Balitech Feedback System{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #1e40af;
-            --accent: #fbbf24;
-            --success: #10b981;
-            --bg-light: #fef3c7;
-            --bg-white: #ffffff;
-            --surface: #f9fafb;
-            --text-dark: #1f2937;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
+            --primary: #FF9B50;
+            --primary-dark: #E68A45;
+            --accent: #7C3AED;
+            --success: #10B981;
+            --bg-body: #13111C;
+            --bg-surface: #1E1B2E;
+            --bg-surface-light: #2A2640;
+            --text-dark: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --border: #332E4A;
         }
         
         body {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            background: var(--bg-body);
+            background-attachment: fixed;
             color: var(--text-dark);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             font-size: 15px;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
@@ -48,43 +51,57 @@
         }
         
         .navbar {
-            background-color: var(--bg-white) !important;
-            border-bottom: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background: transparent !important;
+            padding: 1.25rem 0;
         }
         
         .navbar-brand {
             font-weight: 700;
-            color: var(--primary-dark) !important;
-            font-size: 1.3rem;
+            color: #ffffff !important;
+            font-size: 1.55rem;
+            display: flex;
+            align-items: center;
         }
         
         .btn-primary {
             background-color: var(--primary);
             border-color: var(--primary);
-            color: white;
-            font-weight: 500;
+            color: #13111C;
+            font-weight: 600;
             padding: 0.6rem 1.5rem;
-            border-radius: 6px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
             background-color: var(--primary-dark);
             border-color: var(--primary-dark);
+            color: #13111C;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 155, 80, 0.3);
         }
-        
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 8px;
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: #13111C;
+        }
+
         .card {
-            background-color: var(--bg-white);
+            background-color: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
         }
         
         .card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 155, 80, 0.2);
         }
 
         .card-body {
@@ -97,18 +114,18 @@
         }
         
         .form-control, .form-select {
-            background-color: var(--bg-white);
+            background-color: var(--bg-surface-light);
             border-color: var(--border);
             color: var(--text-dark);
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 0.7rem 1rem;
         }
         
         .form-control:focus, .form-select:focus {
-            background-color: var(--bg-white);
+            background-color: var(--bg-surface-light);
             border-color: var(--primary);
             color: var(--text-dark);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 155, 80, 0.2);
         }
 
         .form-control::placeholder {
@@ -120,12 +137,28 @@
             font-weight: 500;
         }
 
-        .nav-link, .nav-link strong {
-            color: var(--text-dark) !important;
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .nav-link.active {
+            color: var(--primary) !important;
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 1rem; right: 1rem;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
         }
 
         .nav-link:hover {
-            color: var(--primary) !important;
+            color: var(--text-dark) !important;
         }
         
         .alert {
@@ -141,61 +174,200 @@
         a:hover {
             color: var(--primary-dark);
         }
+
+        /* Outline button for navbar */
+        .btn-nav-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            border-radius: 8px;
+            padding: 0.55rem 1.4rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+        .btn-nav-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-nav-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            border: none;
+            color: #13111C;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+        .btn-nav-cta:hover {
+            background: #FFB075;
+            color: #13111C;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 155, 80, 0.3);
+        }
+        .btn-nav-cta i { margin-left: 6px; font-size: 1rem; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     {% if session.get('username') %}
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('forms.list_public_forms') }}">Balitech Feedback System</a>
+    <nav class="navbar navbar-expand-lg navbar-dark px-4">
+        <div class="container-fluid px-0">
+            <a class="navbar-brand" href="{{ url_for('admin.dashboard') if session.get('role') == 'admin' else url_for('forms.list_public_forms') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Balitech Logo" height="42" class="me-2" style="object-fit: contain;">
+                Balitech Feedback
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <span class="nav-link">Welcome, <strong>{{ session.get('username') }}</strong></span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('forms.list_public_forms') }}">Public Forms</a>
-                    </li>
-                    {% if session.get('role') in ['public_user', 'admin'] %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('forms.creator_dashboard') }}">Creator Dashboard</a>
-                    </li>
-                    {% endif %}
-                    {% if session.get('role') == 'admin' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-                    </li>
-                </ul>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <div class="mx-auto"></div>
+
+                <div class="d-flex gap-3 align-items-center">
+                    <span class="text-muted" style="font-size:0.9rem;">Hi, <strong>{{ session.get('username') }}</strong></span>
+                    <a class="btn-nav-outline" href="{{ url_for('auth.logout') }}">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
     {% endif %}
 
     {% if not session.get('username') %}
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('forms.list_public_forms') }}">Balitech Feedback System</a>
-            <div class="ms-auto d-flex gap-2">
-                <a class="btn btn-sm btn-outline-light" href="{{ url_for('auth.login') }}">Login</a>
-                <a class="btn btn-sm btn-primary" href="{{ url_for('auth.register') }}">Create Account</a>
+    <nav class="navbar navbar-expand-lg navbar-dark px-4">
+        <div class="container-fluid px-0">
+            <a class="navbar-brand" href="{{ url_for('forms.list_public_forms') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Balitech Logo" height="42" class="me-2" style="object-fit: contain;">
+                Balitech Feedback
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavPublic">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNavPublic">
+                <div class="mx-auto"></div>
+                <div class="d-flex gap-3 align-items-center mt-3 mt-lg-0">
+                    <a class="btn-nav-outline" href="{{ url_for('auth.login') }}">Login</a>
+                    <a class="btn-nav-cta" href="{{ url_for('auth.register') }}">Create Account <i class="bi bi-arrow-right-short"></i></a>
+                </div>
             </div>
         </div>
     </nav>
     {% endif %}
     
-    <div class="container mt-5">
+    <div class="container mt-4 mb-5">
         {% block content %}{% endblock %}
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Global Confirmation Modal -->
+    <div class="modal fade" id="globalConfirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 1.25rem 1.5rem 1rem;">
+            <div class="d-flex align-items-center gap-2">
+              <div id="gcmIconWrap" style="width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;"></div>
+              <h5 class="modal-title fw-bold mb-0" id="gcmTitle" style="color: var(--text-dark); font-size: 1.1rem;">Confirm</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="opacity:0.5;"></button>
+          </div>
+          <div class="modal-body" id="gcmMessage" style="color: var(--text-muted); font-size: 0.95rem; padding: 1.25rem 1.5rem; line-height: 1.5;">
+            Are you sure?
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border); padding: 1rem 1.5rem; gap: 0.5rem;">
+            <button type="button" class="btn" id="gcmCancelBtn" data-bs-dismiss="modal" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-dark); border-radius: 8px; padding: 0.5rem 1.25rem; font-weight: 600;">Cancel</button>
+            <button type="button" class="btn" id="gcmConfirmBtn" style="border-radius: 8px; padding: 0.5rem 1.25rem; font-weight: 600;">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // ---- Global Confirmation & Alert System ----
+    (function() {
+        let _gcmAction = null;
+        let _gcmModal = null;
+        let _gamModal = null;
+        let _gamCallback = null;
+
+        const CONFIRM_THEMES = {
+            danger:  { bg: 'rgba(198,95,99,0.12)',  color: '#c65f63', icon: 'bi-exclamation-triangle-fill', btnBg: '#c65f63', btnColor: '#fff' },
+            warning: { bg: 'rgba(245,158,11,0.12)', color: '#f59e0b', icon: 'bi-exclamation-circle-fill',   btnBg: '#f59e0b', btnColor: '#2d3250' },
+            success: { bg: 'rgba(16,185,129,0.12)',  color: '#10b981', icon: 'bi-check-circle-fill',        btnBg: '#10b981', btnColor: '#fff' },
+            info:    { bg: 'rgba(249,177,122,0.12)', color: '#f9b17a', icon: 'bi-info-circle-fill',         btnBg: '#f9b17a', btnColor: '#2d3250' },
+        };
+
+        window.showConfirm = function(title, message, btnText, theme, callback) {
+            if (!_gcmModal) _gcmModal = new bootstrap.Modal(document.getElementById('globalConfirmModal'));
+            const t = CONFIRM_THEMES[theme] || CONFIRM_THEMES.info;
+
+            document.getElementById('gcmTitle').textContent = title;
+            document.getElementById('gcmMessage').textContent = message;
+
+            const iconWrap = document.getElementById('gcmIconWrap');
+            iconWrap.style.background = t.bg;
+            iconWrap.innerHTML = `<i class="bi ${t.icon}" style="color:${t.color};"></i>`;
+
+            const btn = document.getElementById('gcmConfirmBtn');
+            btn.textContent = btnText;
+            btn.style.background = t.btnBg;
+            btn.style.borderColor = t.btnBg;
+            btn.style.color = t.btnColor;
+
+            // Show cancel button for confirms
+            document.getElementById('gcmCancelBtn').style.display = '';
+
+            _gcmAction = callback;
+            _gcmModal.show();
+        };
+
+        window.showAlert = function(title, message, theme, callback) {
+            if (!_gcmModal) _gcmModal = new bootstrap.Modal(document.getElementById('globalConfirmModal'));
+            const t = CONFIRM_THEMES[theme] || CONFIRM_THEMES.info;
+
+            document.getElementById('gcmTitle').textContent = title;
+            document.getElementById('gcmMessage').textContent = message;
+
+            const iconWrap = document.getElementById('gcmIconWrap');
+            iconWrap.style.background = t.bg;
+            iconWrap.innerHTML = `<i class="bi ${t.icon}" style="color:${t.color};"></i>`;
+
+            const btn = document.getElementById('gcmConfirmBtn');
+            btn.textContent = 'OK';
+            btn.style.background = t.btnBg;
+            btn.style.borderColor = t.btnBg;
+            btn.style.color = t.btnColor;
+
+            // Hide cancel button for alerts
+            document.getElementById('gcmCancelBtn').style.display = 'none';
+
+            _gcmAction = callback || null;
+            _gcmModal.show();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('gcmConfirmBtn').addEventListener('click', () => {
+                if (_gcmAction) {
+                    _gcmAction();
+                }
+                _gcmAction = null;
+                if (_gcmModal) _gcmModal.hide();
+            });
+        });
+    })();
+    // ---- End Global Confirmation & Alert System ----
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

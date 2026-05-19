@@ -55,6 +55,8 @@ def create_app(config_name='development'):
 
         @app.route('/')
         def index():
+            if session.get('role') == 'admin':
+                return redirect(url_for('admin.dashboard'))
             return redirect(url_for('forms.list_public_forms'))
 
         @app.route('/health')

@@ -32,6 +32,21 @@
                         <textarea id="formDescription" class="form-control" rows="2" placeholder="Optional: Tell respondents what this form is about" style="border-color: #e5e7eb;"></textarea>
                     </div>
 
+                    <!-- Tag Selector -->
+                    <div class="mb-4">
+                        <label class="form-label fw-600" style="color: var(--text-dark);">Category Tags</label>
+                        <p class="text-muted small mb-2">Search and select tags to help users find your form.</p>
+                        <div class="tag-selector-wrap">
+                            <div id="selectedTags" class="tag-chips-container mb-2"></div>
+                            <div class="tag-search-input-wrap">
+                                <i class="bi bi-search tag-search-icon"></i>
+                                <input type="text" id="tagSearchInput" class="form-control tag-search-input" placeholder="Search tags (e.g. lifestyle, community...)">
+                            </div>
+                            <div id="tagDropdown" class="tag-dropdown" style="display:none;"></div>
+                        </div>
+                        <input type="hidden" id="formTagHidden">
+                    </div>
+
                     <hr class="my-4">
 
                     <!-- Questions Section -->
@@ -62,28 +77,60 @@
 {% block extra_css %}
 <style>
     .question-block {
-        border: 2px solid #e5e7eb;
+        border: 2px solid var(--border);
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
-        background-color: #f9fafb;
+        background-color: var(--bg-surface-light);
         transition: all 0.2s;
     }
-    
     .question-block:hover {
         border-color: var(--primary);
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    
-    .q-label {
+    .q-label { font-weight: 600; color: var(--text-dark); }
+    .q-required-label { color: var(--text-dark); font-weight: 500; }
+
+    /* Tag Selector */
+    .tag-selector-wrap { position: relative; }
+    .tag-search-input-wrap { position: relative; }
+    .tag-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+    .tag-search-input { padding-left: 2.2rem; background-color: var(--bg-surface-light); border-color: var(--border); color: var(--text-dark); }
+    .tag-search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(249,177,122,0.2); }
+    .tag-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0; right: 0;
+        z-index: 100;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-top: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .tag-dropdown-item {
+        padding: 0.55rem 1rem;
+        cursor: pointer;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        transition: background 0.15s;
+    }
+    .tag-dropdown-item:hover { background: rgba(249,177,122,0.12); color: var(--primary); }
+    .tag-chips-container { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 10px; }
+    .tag-chip {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        background: rgba(249,177,122,0.15);
+        border: 1px solid rgba(249,177,122,0.35);
+        color: var(--primary);
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.85rem;
         font-weight: 600;
-        color: var(--text-dark);
     }
-    
-    .q-required-label {
-        color: var(--text-dark);
-        font-weight: 500;
-    }
+    .tag-chip .remove-chip { cursor: pointer; opacity: 0.7; font-size: 0.8rem; }
+    .tag-chip .remove-chip:hover { opacity: 1; }
 </style>
 {% endblock %}
 
@@ -95,19 +142,20 @@ function makeQuestionBlock() {
     wrap.innerHTML = `
         <div class="mb-3">
             <label class="form-label fw-600" style="color: var(--text-dark);">Question Text</label>
-            <input class="form-control q-label" placeholder="What would you like to ask?" style="border-color: #e5e7eb;" required>
+            <input class="form-control q-label" placeholder="What would you like to ask?" style="border-color: var(--border);" required>
         </div>
         <div class="mb-3">
             <label class="form-label fw-600" style="color: var(--text-dark);">Question Type</label>
-            <select class="form-select q-type" style="border-color: #e5e7eb;">
+            <select class="form-select q-type" style="border-color: var(--border);">
                 <option value="text">Short Text</option>
                 <option value="multiple_choice">Multiple Choice</option>
                 <option value="checkbox">Checkboxes (Select Multiple)</option>
+                <option value="rating">Star Rating (1-5)</option>
             </select>
         </div>
         <div class="mb-3 q-options-wrap" style="display:none;">
             <label class="form-label fw-600" style="color: var(--text-dark);">Options (one per line)</label>
-            <textarea class="form-control q-options" rows="3" placeholder="Option A&#10;Option B&#10;Option C" style="border-color: #e5e7eb;"></textarea>
+            <textarea class="form-control q-options" rows="3" placeholder="Option A&#10;Option B&#10;Option C" style="border-color: var(--border);"></textarea>
         </div>
         <div class="form-check mb-3">
             <input class="form-check-input" id="req_${Math.random()}" type="checkbox" style="width: 1.25em; height: 1.25em;">
@@ -154,9 +202,10 @@ document.getElementById('addQuestionBtn').addEventListener('click', () => {
 document.getElementById('saveFormBtn').addEventListener('click', async () => {
     const title = document.getElementById('formTitle').value.trim();
     const description = document.getElementById('formDescription').value.trim();
+    const tag = document.getElementById('formTagHidden').value.trim();
 
     if (!title) {
-        alert('Please enter a form title');
+        showAlert('Missing Title', 'Please enter a form title before saving.', 'warning');
         return;
     }
 
@@ -172,7 +221,7 @@ document.getElementById('saveFormBtn').addEventListener('click', async () => {
     });
 
     if (questions.length === 0) {
-        alert('Please add at least one question');
+        showAlert('No Questions', 'Please add at least one question to your form.', 'warning');
         return;
     }
 
@@ -183,6 +232,7 @@ document.getElementById('saveFormBtn').addEventListener('click', async () => {
             body: JSON.stringify({
                 title,
                 description,
+                tag,
                 questions,
                 is_published: true
             })
@@ -190,20 +240,106 @@ document.getElementById('saveFormBtn').addEventListener('click', async () => {
 
         const data = await resp.json();
         if (resp.ok) {
-            alert('Form saved successfully!');
-            window.location.href = '{{ url_for("forms.creator_dashboard") }}';
+            showAlert(
+                'Form Saved Successfully! 🎉',
+                'Your form has been created and is now live. You will be redirected to your dashboard.',
+                'success',
+                () => { window.location.href = '{{ url_for("forms.creator_dashboard") }}'; }
+            );
         } else {
-            alert(data.message || 'Failed to save form');
+            showAlert('Error', data.message || 'Failed to save form. Please try again.', 'danger');
         }
     } catch (error) {
-        alert('Error: ' + error.message);
+        showAlert('Connection Error', 'Something went wrong: ' + error.message, 'danger');
     }
 });
+
+// ---- Tag Selector Logic ----
+const ALL_TAGS = [
+    'Lifestyle', 'Community', 'Education', 'Health', 'Technology',
+    'Food & Beverage', 'Sports', 'Entertainment', 'Environment',
+    'Work & Career', 'Finance', 'Travel', 'Events', 'Research',
+    'Customer Service', 'General'
+];
+let selectedTags = [];
+
+function renderTagChips() {
+    const container = document.getElementById('selectedTags');
+    container.innerHTML = selectedTags.map(t => `
+        <span class="tag-chip">
+            <i class="bi bi-tag-fill" style="font-size:0.75rem;"></i>${t}
+            <span class="remove-chip" onclick="removeTag('${t}')">&times;</span>
+        </span>
+    `).join('');
+    document.getElementById('formTagHidden').value = selectedTags.join(',');
+}
+
+function addTag(tag) {
+    if (!selectedTags.includes(tag)) {
+        selectedTags.push(tag);
+        renderTagChips();
+    }
+    document.getElementById('tagSearchInput').value = '';
+    document.getElementById('tagDropdown').style.display = 'none';
+}
+
+function removeTag(tag) {
+    selectedTags = selectedTags.filter(t => t !== tag);
+    renderTagChips();
+}
+
+function renderTagDropdown(filter) {
+    const dropdown = document.getElementById('tagDropdown');
+    const matches = ALL_TAGS.filter(t =>
+        t.toLowerCase().includes(filter.toLowerCase()) && !selectedTags.includes(t)
+    );
+    if (!matches.length || !filter) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    dropdown.innerHTML = matches.map(t =>
+        `<div class="tag-dropdown-item" onclick="addTag('${t}')">
+            <i class="bi bi-tag me-1" style="font-size:0.8rem;"></i>${t}
+        </div>`
+    ).join('');
+    dropdown.style.display = 'block';
+}
+
+document.getElementById('tagSearchInput').addEventListener('input', e => {
+    renderTagDropdown(e.target.value);
+});
+
+document.getElementById('tagSearchInput').addEventListener('focus', e => {
+    if (e.target.value) renderTagDropdown(e.target.value);
+    else {
+        // show all when focused with no input
+        const dropdown = document.getElementById('tagDropdown');
+        const available = ALL_TAGS.filter(t => !selectedTags.includes(t));
+        dropdown.innerHTML = available.map(t =>
+            `<div class="tag-dropdown-item" onclick="addTag('${t}')">
+                <i class="bi bi-tag me-1" style="font-size:0.8rem;"></i>${t}
+            </div>`
+        ).join('');
+        dropdown.style.display = available.length ? 'block' : 'none';
+    }
+});
+
+document.addEventListener('click', e => {
+    if (!e.target.closest('.tag-selector-wrap')) {
+        document.getElementById('tagDropdown').style.display = 'none';
+    }
+});
+// ---- End Tag Selector ----
 
 // Seed editor with existing form data or a blank question block
 if (initialFormData) {
     document.getElementById('formTitle').value = initialFormData.title || '';
     document.getElementById('formDescription').value = initialFormData.description || '';
+    // Pre-fill tags
+    if (initialFormData.tag) {
+        selectedTags = initialFormData.tag.split(',').map(t => t.trim()).filter(Boolean);
+        renderTagChips();
+    }
     const builder = document.getElementById('questionsBuilder');
     builder.innerHTML = '';
     (initialFormData.questions || []).forEach(q => builder.appendChild(makeQuestionBlockFromData(q)));

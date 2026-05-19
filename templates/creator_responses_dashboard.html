@@ -12,97 +12,328 @@
         </div>
         <div class="d-flex gap-2">
             <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-outline-secondary">← Back to Forms</a>
-            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
         </div>
     </div>
 
     <!-- Responses by Form -->
     {% if response_groups %}
         {% for group in response_groups %}
-        <div class="card mb-4" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" id="form-{{ group.form.id }}">
-            <div class="card-body p-4">
-                <!-- Form Header -->
-                <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
-                    <div>
-                        <h4 class="mb-1" style="color: var(--text-dark); font-weight: 600;">{{ group.form.title }}</h4>
-                        <p class="text-muted small mb-0">{{ group.form.description or 'No description provided' }}</p>
+        <div class="resp-form-group mb-5" id="form-{{ group.form.id }}">
+            <!-- Form Header Card -->
+            <div class="resp-form-header">
+                <div class="resp-form-header-left">
+                    <div class="resp-form-icon">
+                        <i class="bi bi-file-earmark-text-fill"></i>
                     </div>
                     <div>
-                        <span class="badge bg-info" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">
-                            {{ group.responses|length }} <i class="bi bi-file-earmark-check-fill"></i>
-                        </span>
+                        <h4 class="resp-form-title">{{ group.form.title }}</h4>
+                        <p class="resp-form-desc">{{ group.form.description or 'No description provided' }}</p>
                     </div>
                 </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="resp-stat-chip">
+                        <i class="bi bi-people-fill"></i>
+                        <span class="resp-stat-num">{{ group.responses|length }}</span>
+                        <span>response{{ 's' if group.responses|length != 1 else '' }}</span>
+                    </div>
+                    <div class="resp-stat-chip resp-stat-questions">
+                        <i class="bi bi-list-check"></i>
+                        <span class="resp-stat-num">{{ group.form.questions|length }}</span>
+                        <span>question{{ 's' if group.form.questions|length != 1 else '' }}</span>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Responses List -->
-                {% if group.responses %}
-                    <div class="vstack gap-3">
-                        {% for response in group.responses %}
-                        <div class="border rounded p-3" style="border-color: #e5e7eb; background-color: #f9fafb;">
-                            <!-- Response Header -->
-                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3 pb-2 border-bottom">
-                                <div>
-                                    <strong style="color: var(--text-dark);">
-                                        {% if response.respondent_name %}
-                                            {{ response.respondent_name }}
-                                        {% else %}
-                                            <i class="bi bi-incognito"></i> Anonymous
-                                        {% endif %}
-                                    </strong>
-                                    <div class="text-muted small mt-1">
-                                        <i class="bi bi-calendar"></i> 
-                                        {{ response.submitted_at.strftime('%B %d, %Y at %I:%M %p') if response.submitted_at else 'Unknown date' }}
-                                    </div>
-                                </div>
-                                <span class="badge bg-light text-dark">Response #{{ loop.index }}</span>
-                            </div>
-
-                            <!-- Answers -->
-                            <div class="vstack gap-2">
-                                {% for answer in response.answers %}
-                                <div class="p-3 rounded" style="background-color: #ffffff; border-left: 3px solid var(--primary);">
-                                    <div class="fw-600" style="color: var(--text-dark);">
-                                        {{ loop.index }}. {{ answer.question }}
-                                    </div>
-                                    <div class="text-muted small mb-2">
-                                        <i class="bi bi-type"></i> {{ answer.type.replace('_', ' ').title() }}
-                                    </div>
-                                    <div style="color: var(--text-dark); margin-top: 0.5rem;">
-                                        {% if answer.value is sequence and answer.value is not string %}
-                                            <div class="d-flex flex-wrap gap-2">
-                                                {% for item in answer.value %}
-                                                <span class="badge bg-info">{{ item }}</span>
-                                                {% endfor %}
-                                            </div>
-                                        {% elif answer.value is not none and answer.value != '' %}
-                                            <div class="fst-normal">{{ answer.value }}</div>
-                                        {% else %}
-                                            <span class="text-muted fst-italic">No answer provided</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
+            <!-- Rating Averages Summary -->
+            {% if group.rating_averages %}
+            <div style="background: var(--bg-surface); border: 1px solid var(--border); border-top: none; padding: 1rem 1.5rem;">
+                <h6 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem;">⭐ Rating Averages</h6>
+                <div class="d-flex flex-wrap gap-3">
+                    {% for q in group.form.questions %}
+                        {% if q.id in group.rating_averages %}
+                        <div class="rating-avg-card">
+                            <div class="rating-avg-label">{{ q.label }}</div>
+                            <div class="rating-avg-stars">
+                                {% set avg = group.rating_averages[q.id].avg %}
+                                {% for i in range(1, 6) %}
+                                    {% if i <= avg | int %}
+                                        <i class="bi bi-star-fill" style="color: #FBBF24;"></i>
+                                    {% elif i - avg < 1 and i - avg > 0 %}
+                                        <i class="bi bi-star-half" style="color: #FBBF24;"></i>
+                                    {% else %}
+                                        <i class="bi bi-star" style="color: var(--border);"></i>
+                                    {% endif %}
                                 {% endfor %}
+                                <span class="rating-avg-num">{{ avg }}</span>
+                            </div>
+                            <div class="rating-avg-count">{{ group.rating_averages[q.id].count }} response{{ 's' if group.rating_averages[q.id].count != 1 else '' }}</div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Responses -->
+            {% if group.responses %}
+                <div class="resp-responses-list">
+                    {% for response in group.responses %}
+                    <div class="resp-card">
+                        <!-- Response Header -->
+                        <div class="resp-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                            <div class="resp-card-who">
+                                <div class="resp-avatar">
+                                    {% if response.respondent_name %}
+                                        {{ response.respondent_name[0] | upper }}
+                                    {% else %}
+                                        <i class="bi bi-person-fill"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="resp-name">
+                                        {{ response.respondent_name or 'Anonymous' }}
+                                    </div>
+                                    <div class="resp-date">
+                                        <i class="bi bi-clock"></i>
+                                        {{ response.submitted_at.strftime('%b %d, %Y at %I:%M %p') if response.submitted_at else 'Unknown' }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="resp-index-badge">#{{ loop.index }}</span>
+                                <i class="bi bi-chevron-down resp-chevron"></i>
                             </div>
                         </div>
-                        {% endfor %}
+
+                        <!-- Answers (collapsible) -->
+                        <div class="resp-card-body">
+                            {% for answer in response.answers %}
+                            <div class="resp-answer">
+                                <div class="resp-answer-header">
+                                    <span class="resp-answer-num">Q{{ loop.index }}</span>
+                                    <span class="resp-answer-question">{{ answer.question }}</span>
+                                    <span class="resp-answer-type">
+                                        {% if answer.type == 'text' %}
+                                            <i class="bi bi-fonts"></i> Text
+                                        {% elif answer.type == 'multiple_choice' %}
+                                            <i class="bi bi-ui-radios"></i> Choice
+                                        {% elif answer.type == 'checkbox' %}
+                                            <i class="bi bi-ui-checks"></i> Multi
+                                        {% elif answer.type == 'rating' %}
+                                            <i class="bi bi-star-fill"></i> Rating
+                                        {% else %}
+                                            <i class="bi bi-type"></i> {{ answer.type | replace('_', ' ') | title }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="resp-answer-value">
+                                    {% if answer.type == 'rating' and answer.value %}
+                                        <div class="d-flex align-items-center gap-1">
+                                            {% for i in range(1, 6) %}
+                                                {% if i <= answer.value | int %}
+                                                    <i class="bi bi-star-fill" style="color: #FBBF24; font-size: 1.1rem;"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star" style="color: var(--border); font-size: 1.1rem;"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <span style="color: var(--text-muted); font-size: 0.85rem; margin-left: 0.5rem;">({{ answer.value }}/5)</span>
+                                        </div>
+                                    {% elif answer.value is sequence and answer.value is not string %}
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for item in answer.value %}
+                                            <span class="resp-choice-badge">{{ item }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% elif answer.value is not none and answer.value != '' %}
+                                        <div class="resp-text-answer">{{ answer.value }}</div>
+                                    {% else %}
+                                        <span class="resp-empty">— No answer provided</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                {% else %}
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle"></i> No submissions yet for this form.
-                    </div>
-                {% endif %}
-            </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="resp-empty-state-small">
+                    <i class="bi bi-inbox"></i>
+                    <span>No submissions yet for this form.</span>
+                </div>
+            {% endif %}
         </div>
         {% endfor %}
     {% else %}
-        <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <div class="card-body p-5 text-center">
-                <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-muted); opacity: 0.5;"></i>
-                <h5 class="mt-3 text-muted">No Forms Created</h5>
-                <p class="text-muted mb-3">Create a form first to receive responses</p>
-                <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-primary">Go to My Forms</a>
-            </div>
+        <div class="resp-empty-state">
+            <i class="bi bi-clipboard-data" style="font-size: 3.5rem; color: var(--primary); opacity: 0.4;"></i>
+            <h5 style="color: var(--text-dark); margin-top: 1rem;">No Forms Created</h5>
+            <p class="text-muted mb-3">Create a form first to receive responses</p>
+            <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-primary">Go to My Forms</a>
         </div>
     {% endif %}
 </div>
+
+<style>
+    /* Form Group Header */
+    .resp-form-header {
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+        background: var(--bg-surface); border: 1px solid var(--border);
+        border-radius: 14px; padding: 1.25rem 1.5rem;
+        margin-bottom: 0;
+        border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+        border-bottom: 1px solid rgba(249,177,122,0.15);
+    }
+    .resp-form-header-left { display: flex; align-items: center; gap: 1rem; }
+    .resp-form-icon {
+        width: 44px; height: 44px; border-radius: 10px;
+        background: rgba(249,177,122,0.12); color: var(--primary);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem; flex-shrink: 0;
+    }
+    .resp-form-title { color: var(--text-dark); font-weight: 700; font-size: 1.15rem; margin: 0; }
+    .resp-form-desc { color: var(--text-muted); font-size: 0.85rem; margin: 0.15rem 0 0 0; }
+
+    /* Stat Chips */
+    .resp-stat-chip {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        background: rgba(249,177,122,0.1); border: 1px solid rgba(249,177,122,0.25);
+        color: var(--primary); border-radius: 20px;
+        padding: 0.3rem 0.8rem; font-size: 0.82rem; font-weight: 600;
+    }
+    .resp-stat-questions {
+        background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.25);
+        color: #a78bfa;
+    }
+    .resp-stat-num { font-weight: 800; font-size: 0.95rem; }
+
+    /* Responses List */
+    .resp-responses-list {
+        background: var(--bg-surface); border: 1px solid var(--border);
+        border-top: none; border-radius: 0 0 14px 14px;
+        overflow: hidden;
+    }
+
+    /* Response Card */
+    .resp-card { border-bottom: 1px solid var(--border); }
+    .resp-card:last-child { border-bottom: none; }
+
+    .resp-card-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 1rem 1.5rem; cursor: pointer;
+        transition: background 0.2s;
+    }
+    .resp-card-header:hover { background: rgba(255,255,255,0.03); }
+
+    .resp-card-who { display: flex; align-items: center; gap: 0.75rem; }
+    .resp-avatar {
+        width: 38px; height: 38px; border-radius: 10px;
+        background: linear-gradient(135deg, #424769, #676f9d);
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 0.95rem; flex-shrink: 0;
+    }
+    .resp-name { color: var(--text-dark); font-weight: 600; font-size: 0.95rem; }
+    .resp-date { color: var(--text-muted); font-size: 0.78rem; margin-top: 0.1rem; }
+
+    .resp-index-badge {
+        background: rgba(249,177,122,0.1); border: 1px solid rgba(249,177,122,0.25);
+        color: var(--primary); border-radius: 6px;
+        padding: 0.2rem 0.5rem; font-size: 0.75rem; font-weight: 700;
+    }
+    .resp-chevron {
+        color: var(--text-muted); transition: transform 0.3s ease; font-size: 0.85rem;
+    }
+    .resp-card.expanded .resp-chevron { transform: rotate(180deg); }
+
+    /* Collapsible Body */
+    .resp-card-body {
+        max-height: 0; overflow: hidden;
+        transition: max-height 0.4s ease, padding 0.3s ease;
+        padding: 0 1.5rem;
+        background: rgba(0,0,0,0.08);
+    }
+    .resp-card.expanded .resp-card-body {
+        max-height: 2000px;
+        padding: 1rem 1.5rem 1.25rem;
+    }
+
+    /* Answer Items */
+    .resp-answer {
+        background: var(--bg-surface); border: 1px solid var(--border);
+        border-radius: 10px; padding: 0.85rem 1rem;
+        margin-bottom: 0.6rem;
+    }
+    .resp-answer:last-child { margin-bottom: 0; }
+
+    .resp-answer-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .resp-answer-num {
+        background: var(--primary); color: #2d3250;
+        font-weight: 800; font-size: 0.7rem; border-radius: 5px;
+        padding: 0.15rem 0.4rem; flex-shrink: 0;
+    }
+    .resp-answer-question { color: var(--text-dark); font-weight: 600; font-size: 0.9rem; }
+    .resp-answer-type {
+        color: var(--text-muted); font-size: 0.75rem;
+        margin-left: auto; white-space: nowrap;
+    }
+
+    .resp-answer-value { margin-top: 0.25rem; }
+    .resp-text-answer { color: var(--text-dark); font-size: 0.92rem; line-height: 1.5; }
+    .resp-choice-badge {
+        display: inline-flex; align-items: center;
+        background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25);
+        color: #a78bfa; border-radius: 6px;
+        padding: 0.2rem 0.6rem; font-size: 0.82rem; font-weight: 600;
+    }
+    .resp-empty { color: var(--text-muted); font-size: 0.85rem; font-style: italic; }
+
+    /* Empty States */
+    .resp-empty-state-small {
+        background: var(--bg-surface); border: 1px solid var(--border);
+        border-top: none; border-radius: 0 0 14px 14px;
+        padding: 2rem 1.5rem; text-align: center;
+        color: var(--text-muted); font-size: 0.9rem;
+        display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .resp-empty-state {
+        background: var(--bg-surface); border: 1px solid var(--border);
+        border-radius: 14px; padding: 3rem; text-align: center;
+    }
+
+    /* Rating Average Cards */
+    .rating-avg-card {
+        background: rgba(251, 191, 36, 0.06);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        min-width: 180px;
+        flex: 1;
+    }
+    .rating-avg-label {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 0.35rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .rating-avg-stars {
+        display: flex;
+        align-items: center;
+        gap: 0.15rem;
+        font-size: 1rem;
+    }
+    .rating-avg-num {
+        color: #FBBF24;
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-left: 0.5rem;
+    }
+    .rating-avg-count {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        margin-top: 0.2rem;
+    }
+</style>
 {% endblock %}

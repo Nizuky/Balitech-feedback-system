@@ -3,70 +3,772 @@
 {% block title %}Feedback Forms - Balitech{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-5">
-    <!-- Header -->
-    <div class="row mb-5">
-        <div class="col-lg-8 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700;">Available Forms</h1>
-                    <p class="text-muted">Fill out our feedback forms to help us improve</p>
+<div class="container-fluid py-2">
+    <!-- Hero Section -->
+    <div class="row mb-4 align-items-center hero-section">
+        <div class="col-lg-6 hero-text-col">
+            <div class="hero-welcome-pill mb-4">
+                <i class="bi bi-gear-fill text-primary me-2"></i> Welcome to Balitech Feedback
+            </div>
+            
+            <h1 class="hero-title mb-4">
+                Discover what others<br>
+                are <span class="text-gradient">asking — and answer.</span>
+            </h1>
+            
+            <p class="hero-subtitle mb-5">
+                Join a growing community where questions get real answers,<br>
+                insights are shared, and knowledge grows together.
+            </p>
+            
+            <div class="d-flex flex-wrap gap-3 mb-5 hero-actions">
+                <a href="{{ url_for('auth.register') if not session.get('user_id') else url_for('forms.creator_new_form') }}" class="btn-hero-primary">
+                    {{ 'Create Account' if not session.get('user_id') else 'Create Form' }} <i class="bi bi-arrow-right-short"></i>
+                </a>
+                <a href="{{ url_for('auth.login') if not session.get('user_id') else url_for('forms.creator_dashboard') }}" class="btn-hero-outline">
+                    {{ 'Login' if not session.get('user_id') else 'Dashboard' }} <i class="bi bi-arrow-right-short"></i>
+                </a>
+            </div>
+            
+            <div class="hero-social-proof d-flex align-items-center gap-3">
+                <div class="avatar-group">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="Member" class="avatar">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="Member" class="avatar">
+                    <img src="https://i.pravatar.cc/100?img=33" alt="Member" class="avatar">
+                    <img src="https://i.pravatar.cc/100?img=44" alt="Member" class="avatar">
+                </div>
+                <div class="social-text">
+                    Join <strong>12,500+</strong> members<br>
+                    <span class="text-muted">sharing knowledge daily.</span>
                 </div>
             </div>
+        </div>
+        
+        <div class="col-lg-6 hero-img-col position-relative text-center mt-5 mt-lg-0">
+            <!-- Floating Elements -->
+            <div class="floating-icon float-1"><i class="bi bi-question-lg"></i></div>
+            <div class="floating-icon float-2"><i class="bi bi-exclamation-lg"></i></div>
+            <div class="floating-icon float-3"><i class="bi bi-hand-thumbs-up-fill"></i></div>
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+            
+            <img src="{{ url_for('static', filename='img/balitech_character.png') }}" alt="Balitech mascot" class="hero-character">
+        </div>
+    </div>
 
-            <!-- CTA Buttons -->
-            <div class="d-flex gap-2 flex-wrap mb-4">
-                {% if session.get('user_id') %}
-                    {% if session.get('role') == 'admin' %}
-                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-info">Admin Dashboard</a>
-                    {% else %}
-                        <a href="{{ url_for('forms.creator_dashboard') }}" class="btn btn-info">My Forms</a>
-                    {% endif %}
-                    <a href="{{ url_for('forms.creator_new_form') }}" class="btn btn-success">+ Create New Form</a>
-                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}?next=/forms" class="btn btn-info">Login</a>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-info">Sign Up to Create Forms</a>
-                {% endif %}
+    <!-- Stats Section -->
+    <div class="stats-container mb-5">
+        <div class="row g-0">
+            <div class="col-md-3 col-sm-6 stat-block">
+                <div class="stat-icon-wrap bg-purple-glow">
+                    <i class="bi bi-people-fill text-white"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>12.5K+</h4>
+                    <p>Active Members</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 stat-block">
+                <div class="stat-icon-wrap bg-orange-glow">
+                    <i class="bi bi-chat-left-dots-fill text-white"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>8.7K+</h4>
+                    <p>Questions Asked</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 stat-block">
+                <div class="stat-icon-wrap bg-indigo-glow">
+                    <i class="bi bi-check-circle-fill text-white"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>15.3K+</h4>
+                    <p>Answers Shared</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 stat-block border-end-0">
+                <div class="stat-icon-wrap bg-gold-glow">
+                    <i class="bi bi-trophy-fill text-white"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>98%</h4>
+                    <p>Satisfaction Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search & Categories Section -->
+    <div class="search-category-container mb-5">
+        <div class="search-bar-header mb-4">
+            <div class="search-input-wrap">
+                <i class="bi bi-search search-icon"></i>
+                <input
+                    type="text"
+                    id="formSearchBar"
+                    class="hero-search-input"
+                    placeholder="Search by title, description, or tag..."
+                    value="{{ search_query }}"
+                    autocomplete="off"
+                >
+            </div>
+            <div class="popular-searches d-none d-lg-flex">
+                <span class="text-muted me-2">Popular Searches</span>
+                <span class="popular-tag">Python</span>
+                <span class="popular-tag">React</span>
+                <span class="popular-tag">Career Advice</span>
+            </div>
+        </div>
+        
+        <div class="categories-grid">
+            <div class="category-card active" onclick="filterByTag('')" data-tag="">
+                <div class="cat-icon"><i class="bi bi-grid-fill"></i></div>
+                <h5>All Categories</h5>
+                <p>Explore all topics</p>
+            </div>
+            <div class="category-card" onclick="filterByTag('Technology')" data-tag="technology">
+                <div class="cat-icon bg-cat-tech"><i class="bi bi-code-slash"></i></div>
+                <h5>Technology</h5>
+                <p>Software, AI, DevOps</p>
+            </div>
+            <div class="category-card" onclick="filterByTag('Education')" data-tag="education">
+                <div class="cat-icon bg-cat-edu"><i class="bi bi-mortarboard-fill"></i></div>
+                <h5>Education</h5>
+                <p>Learning, Courses, Tips</p>
+            </div>
+            <div class="category-card" onclick="filterByTag('Health')" data-tag="health">
+                <div class="cat-icon bg-cat-health"><i class="bi bi-heart-pulse-fill"></i></div>
+                <h5>Health</h5>
+                <p>Wellness, Fitness</p>
+            </div>
+            <div class="category-card" onclick="filterByTag('Finance')" data-tag="finance">
+                <div class="cat-icon bg-cat-fin"><i class="bi bi-currency-dollar"></i></div>
+                <h5>Finance</h5>
+                <p>Money, Investing, Crypto</p>
+            </div>
+            <div class="category-card" onclick="toggleMoreCategories()" id="moreCatBtn" data-tag="moreBtn">
+                <div class="cat-icon bg-cat-more"><i class="bi bi-three-dots"></i></div>
+                <h5>More</h5>
+                <p>View all categories</p>
+            </div>
+            
+            <div class="category-card extra-category d-none" onclick="filterByTag('Lifestyle')" data-tag="lifestyle">
+                <div class="cat-icon"><i class="bi bi-cup-hot"></i></div>
+                <h5>Lifestyle</h5>
+                <p>Daily life, Hobbies</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Community')" data-tag="community">
+                <div class="cat-icon"><i class="bi bi-people"></i></div>
+                <h5>Community</h5>
+                <p>Social, Local</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Sports')" data-tag="sports">
+                <div class="cat-icon"><i class="bi bi-trophy"></i></div>
+                <h5>Sports</h5>
+                <p>Games, Athletics</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Entertainment')" data-tag="entertainment">
+                <div class="cat-icon"><i class="bi bi-controller"></i></div>
+                <h5>Entertainment</h5>
+                <p>Movies, Gaming</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Environment')" data-tag="environment">
+                <div class="cat-icon"><i class="bi bi-tree"></i></div>
+                <h5>Environment</h5>
+                <p>Nature, Ecology</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Work & Career')" data-tag="work & career">
+                <div class="cat-icon"><i class="bi bi-briefcase"></i></div>
+                <h5>Work & Career</h5>
+                <p>Jobs, Professional</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Travel')" data-tag="travel">
+                <div class="cat-icon"><i class="bi bi-airplane"></i></div>
+                <h5>Travel</h5>
+                <p>Trips, Places</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Events')" data-tag="events">
+                <div class="cat-icon"><i class="bi bi-calendar-event"></i></div>
+                <h5>Events</h5>
+                <p>Gatherings, Shows</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Research')" data-tag="research">
+                <div class="cat-icon"><i class="bi bi-search"></i></div>
+                <h5>Research</h5>
+                <p>Studies, Surveys</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('Customer Service')" data-tag="customer service">
+                <div class="cat-icon"><i class="bi bi-headset"></i></div>
+                <h5>Service</h5>
+                <p>Support, Feedback</p>
+            </div>
+            <div class="category-card extra-category d-none" onclick="filterByTag('General')" data-tag="general">
+                <div class="cat-icon"><i class="bi bi-card-text"></i></div>
+                <h5>General</h5>
+                <p>Miscellaneous</p>
             </div>
         </div>
     </div>
 
     <!-- Forms Grid -->
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            {% if forms %}
-                <div class="row g-3">
-                    {% for f in forms %}
-                    <div class="col-md-6">
-                        <div class="card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s;">
-                            <div class="card-body p-4">
-                                <h5 class="card-title mb-2" style="color: var(--text-dark); font-weight: 600;">{{ f.title }}</h5>
-                                <p class="text-muted small mb-3">{{ f.description or 'No description provided' }}</p>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ url_for('forms.answer_form', public_id=f.public_id) }}" class="btn btn-primary btn-sm flex-grow-1">Open Form</a>
-                                    {% if session.get('user_id') and f.creator_id == session.get('user_id') %}
-                                    <a href="{{ url_for('forms.creator_new_form', form_id=f.id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                    {% endif %}
+    <div class="forms-wrapper mb-5">
+        {% if forms %}
+            <div class="row g-4" id="formsGrid">
+                {% for f in forms %}
+                <div class="col-lg-4 col-md-6 form-grid-item"
+                     data-title="{{ f.title | lower }}"
+                     data-desc="{{ (f.description or '') | lower }}"
+                     data-tags="{{ (f.tag or '') | lower }}">
+                    <div class="form-card h-100">
+                        <div class="form-card-content">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="form-card-icon">
+                                    <i class="bi bi-journal-text"></i>
                                 </div>
+                                <span class="form-card-date">{{ f.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <h3 class="form-card-title">{{ f.title }}</h3>
+                            <p class="form-card-desc">{{ f.description or 'No description provided' }}</p>
+                            
+                            {% if f.tag %}
+                            <div class="form-card-tags mb-3">
+                                {% for t in f.tag.split(',') %}
+                                    {% set t = t.strip() %}
+                                    {% if t %}
+                                    <span class="form-tag-pill" onclick="filterByTag('{{ t }}', event)">
+                                        {{ t }}
+                                    </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem;">
+                                <i class="bi bi-chat-left-text-fill text-primary" style="opacity: 0.8;"></i>
+                                <span><strong>{{ f.responses|length }}</strong> response{{ 's' if f.responses|length != 1 else '' }}</span>
                             </div>
                         </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-                    <div class="card-body p-5 text-center">
-                        <i class="bi bi-inbox" style="font-size: 3rem; color: var(--text-muted); opacity: 0.5;"></i>
-                        <p class="text-muted mt-3 mb-0">No published forms are available yet.</p>
+                        <div class="form-card-footer">
+                            <a href="{{ url_for('forms.answer_form', public_id=f.public_id) }}" class="btn-form-action w-100">Answer Form <i class="bi bi-arrow-right"></i></a>
+                        </div>
                     </div>
                 </div>
-            {% endif %}
-        </div>
+                {% endfor %}
+            </div>
+            <div id="noResultsMsg" class="text-center py-5" style="display:none;">
+                <div class="mb-3"><i class="bi bi-search" style="font-size: 3rem; color: var(--text-muted); opacity:0.3;"></i></div>
+                <h4 class="text-white">No matches found</h4>
+                <p class="text-muted">We couldn't find any forms matching your search criteria.</p>
+                <button onclick="clearSearch()" class="btn btn-outline-light btn-sm mt-2 px-4">Clear Search</button>
+            </div>
+        {% else %}
+            <div class="text-center py-5" style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px;">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem; opacity: 0.5;"></i>
+                <h4 class="text-white mt-3">No forms available</h4>
+                <p class="text-muted mb-0">There are currently no public forms to display.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <style>
-    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important; }
+    /* Hero Section */
+    .hero-section {
+        padding: 4rem 2rem 2rem;
+        position: relative;
+    }
+    .hero-welcome-pill {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 30px;
+        padding: 0.4rem 1.2rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.15;
+        letter-spacing: -1px;
+    }
+    .text-gradient {
+        background: linear-gradient(to right, #FF9B50, #FF7B50);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+        max-width: 90%;
+    }
+    
+    /* Buttons */
+    .btn-hero-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary);
+        color: #13111C;
+        border-radius: 12px;
+        padding: 0.8rem 2rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-hero-primary:hover {
+        background: #FFB075;
+        color: #13111C;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 155, 80, 0.4);
+    }
+    .btn-hero-primary i {
+        margin-left: 8px;
+        font-size: 1.2rem;
+        transition: transform 0.2s;
+    }
+    .btn-hero-primary:hover i {
+        transform: translateX(3px);
+    }
+    
+    .btn-hero-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fff;
+        border-radius: 12px;
+        padding: 0.8rem 2rem;
+        font-size: 1.05rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-hero-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #fff;
+    }
+    .btn-hero-outline i {
+        margin-left: 8px;
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        transition: transform 0.2s;
+    }
+    .btn-hero-outline:hover i {
+        transform: translateX(3px);
+        color: #fff;
+    }
+    
+    /* Social Proof Avatars */
+    .hero-social-proof {
+        margin-top: 1rem;
+    }
+    .avatar-group {
+        display: flex;
+    }
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--bg-body);
+        margin-left: -12px;
+        object-fit: cover;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .social-text {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    /* Mascot & Floating Elements */
+    .hero-character {
+        max-width: 100%;
+        height: 500px;
+        object-fit: contain;
+        position: relative;
+        z-index: 2;
+        filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+    }
+    .glow-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: 0;
+        opacity: 0.5;
+    }
+    .orb-1 {
+        width: 300px; height: 300px;
+        background: rgba(255, 155, 80, 0.2);
+        top: 20%; right: 10%;
+    }
+    .orb-2 {
+        width: 250px; height: 250px;
+        background: rgba(124, 58, 237, 0.2);
+        bottom: 10%; left: 20%;
+    }
+    .floating-icon {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px; height: 50px;
+        border-radius: 14px;
+        color: white;
+        font-size: 1.5rem;
+        z-index: 3;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        animation: float 4s ease-in-out infinite;
+    }
+    .float-1 {
+        background: linear-gradient(135deg, #7C3AED, #5B21B6);
+        top: 15%; left: 10%;
+        animation-delay: 0s;
+    }
+    .float-2 {
+        background: linear-gradient(135deg, #FF9B50, #E68A45);
+        top: 25%; right: 5%;
+        width: 40px; height: 40px; font-size: 1.2rem; border-radius: 12px;
+        animation-delay: 1s;
+    }
+    .float-3 {
+        background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+        bottom: 35%; left: 5%;
+        animation-delay: 2s;
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Stats Section */
+    .stats-container {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .stat-block {
+        display: flex;
+        align-items: center;
+        padding: 2rem;
+        border-right: 1px solid var(--border);
+    }
+    @media (max-width: 767px) {
+        .stat-block { border-right: none; border-bottom: 1px solid var(--border); }
+        .stat-block:last-child { border-bottom: none; }
+    }
+    .stat-icon-wrap {
+        width: 50px; height: 50px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
+        margin-right: 1.25rem;
+    }
+    .bg-purple-glow { background: rgba(124, 58, 237, 0.15); box-shadow: 0 0 15px rgba(124, 58, 237, 0.3); color: #A78BFA !important; }
+    .bg-purple-glow i { color: #A78BFA !important; }
+    .bg-orange-glow { background: rgba(255, 155, 80, 0.15); box-shadow: 0 0 15px rgba(255, 155, 80, 0.3); color: #FFB075 !important; }
+    .bg-orange-glow i { color: #FFB075 !important; }
+    .bg-indigo-glow { background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); color: #818CF8 !important; }
+    .bg-indigo-glow i { color: #818CF8 !important; }
+    .bg-gold-glow { background: rgba(245, 158, 11, 0.15); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); color: #FBBF24 !important; }
+    .bg-gold-glow i { color: #FBBF24 !important; }
+    
+    .stat-info h4 { margin: 0; font-size: 1.6rem; font-weight: 700; color: #fff; }
+    .stat-info p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Search & Categories Container */
+    .search-category-container {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 2rem;
+    }
+    .search-bar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .search-input-wrap {
+        position: relative;
+        flex: 1;
+        max-width: 600px;
+    }
+    .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+    .hero-search-input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.05rem;
+        padding: 1rem 1rem 1rem 3.5rem;
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+    .hero-search-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .hero-search-input::placeholder { color: var(--text-muted); }
+    
+    .popular-searches {
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+    }
+    .popular-tag {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 0.2rem 0.8rem;
+        margin-right: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-muted);
+    }
+    .popular-tag:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #fff;
+    }
+
+    /* Categories Grid */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .category-card {
+        background: var(--bg-surface-light);
+        border: 1px solid transparent;
+        border-bottom: 3px solid transparent;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .category-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom-color: var(--primary);
+    }
+    .category-card.active {
+        border-color: var(--primary);
+        border-bottom-color: var(--primary);
+        background: rgba(255, 155, 80, 0.05);
+    }
+    .cat-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-muted);
+    }
+    .category-card.active .cat-icon {
+        color: var(--primary);
+        background: rgba(255, 155, 80, 0.15);
+    }
+    .bg-cat-tech { color: #A78BFA; }
+    .bg-cat-edu { color: #60A5FA; }
+    .bg-cat-health { color: #F472B6; }
+    .bg-cat-fin { color: #34D399; }
+    
+    .category-card h5 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; color: #fff; }
+    .category-card p { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+
+    /* Form Cards Update */
+    .form-card {
+        background: linear-gradient(145deg, var(--bg-surface-light) 0%, var(--bg-surface) 100%);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .form-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-color: rgba(255, 155, 80, 0.3);
+    }
+    .form-card-content {
+        padding: 2rem;
+        flex-grow: 1;
+    }
+    .form-card-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        background: rgba(255, 155, 80, 0.1);
+        color: var(--primary);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+    }
+    .form-card-date {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+    }
+    .form-card-title {
+        color: #fff; font-weight: 700; font-size: 1.3rem; margin-bottom: 0.75rem; line-height: 1.3;
+    }
+    .form-card-desc {
+        color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .form-card-tags {
+        display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .form-tag-pill {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-muted);
+        border-radius: 6px;
+        padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 500;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .form-tag-pill:hover {
+        background: rgba(255, 155, 80, 0.15); color: var(--primary);
+    }
+    .form-card-footer {
+        padding: 1rem 2rem;
+        border-top: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.01);
+    }
+    .btn-form-action {
+        display: flex; align-items: center; justify-content: center;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600; font-size: 0.95rem;
+        transition: color 0.2s;
+    }
+    .btn-form-action i { margin-left: 8px; transition: transform 0.2s; }
+    .form-card:hover .btn-form-action { color: var(--primary); }
+    .form-card:hover .btn-form-action i { transform: translateX(4px); }
+    
+    .form-grid-item.hidden { display: none !important; }
+    
+    @media (max-width: 991px) {
+        .hero-title { font-size: 2.8rem; }
+        .hero-character { height: 350px; }
+        .categories-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
 </style>
+
+<script>
+    let activeTag = '';
+    const searchBar = document.getElementById('formSearchBar');
+
+    function filterForms() {
+        const q = (searchBar?.value || '').toLowerCase().trim();
+        const items = document.querySelectorAll('.form-grid-item');
+        let visible = 0;
+        
+        items.forEach(item => {
+            const title = item.dataset.title || '';
+            const desc = item.dataset.desc || '';
+            const tags = item.dataset.tags || '';
+            const matchesSearch = !q || title.includes(q) || desc.includes(q) || tags.includes(q);
+            
+            // specific tag handling
+            let matchesTag = true;
+            if (activeTag) {
+                matchesTag = tags.includes(activeTag.toLowerCase());
+            }
+            
+            if (matchesSearch && matchesTag) {
+                item.classList.remove('hidden');
+                visible++;
+            } else {
+                item.classList.add('hidden');
+            }
+        });
+        
+        const noResults = document.getElementById('noResultsMsg');
+        if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    function filterByTag(tag, event) {
+        if (event) event.stopPropagation();
+        activeTag = tag;
+        
+        // Update active class on category cards
+        document.querySelectorAll('.category-card').forEach(card => {
+            const cardTag = card.dataset.tag || '';
+            card.classList.toggle('active', cardTag.toLowerCase() === tag.toLowerCase());
+        });
+        
+        filterForms();
+    }
+
+    function clearSearch() {
+        if (searchBar) searchBar.value = '';
+        filterByTag('');
+    }
+
+    function toggleMoreCategories() {
+        const extraCats = document.querySelectorAll('.extra-category');
+        if (extraCats.length === 0) return;
+        
+        const isHidden = extraCats[0].classList.contains('d-none');
+        
+        extraCats.forEach(cat => {
+            if (isHidden) {
+                cat.classList.remove('d-none');
+            } else {
+                cat.classList.add('d-none');
+            }
+        });
+        
+        const moreBtn = document.getElementById('moreCatBtn');
+        if (moreBtn) {
+            if (isHidden) {
+                moreBtn.querySelector('h5').textContent = 'Less';
+                moreBtn.querySelector('p').textContent = 'Hide categories';
+                moreBtn.querySelector('i').className = 'bi bi-dash-lg';
+            } else {
+                moreBtn.querySelector('h5').textContent = 'More';
+                moreBtn.querySelector('p').textContent = 'View all categories';
+                moreBtn.querySelector('i').className = 'bi bi-three-dots';
+            }
+        }
+    }
+
+    if (searchBar) searchBar.addEventListener('input', filterForms);
+
+    // Make popular searches clickable
+    document.querySelectorAll('.popular-tag').forEach(tag => {
+        tag.addEventListener('click', function() {
+            if (searchBar) {
+                searchBar.value = this.textContent.trim();
+                filterForms();
+            }
+        });
+    });
+
+    // Run once on load
+    filterForms();
+</script>
 {% endblock %}

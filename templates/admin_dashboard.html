@@ -10,22 +10,19 @@
             <h1 class="mb-2" style="color: var(--text-dark); font-weight: 700; font-size: 2rem;">System Management</h1>
             <p class="text-muted mb-0">Manage users, questions, and survey responses</p>
         </div>
-        <button class="btn btn-primary" onclick="location.href='{{ url_for('feedback.dashboard') }}'">← Back to Survey</button>
     </div>
-
-    <!-- Stats Cards -->
     <div class="row g-4 mb-5">
         <div class="col-sm-6 col-lg-3">
-            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div class="card stat-card stat-users h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" onclick="new bootstrap.Tab(document.querySelector('#users-tab')).show()">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="text-muted small mb-1">Total Users</p>
-                            <h2 class="mb-2" id="statUsers" style="color: var(--primary); font-weight: 700;">-</h2>
-                            <small class="text-muted"><span class="text-success">↑ 12%</span> from last month</small>
+                            <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1" style="letter-spacing: 1px;">Total Users</p>
+                            <h2 class="mb-2 display-6" id="statUsers" style="color: var(--primary); font-weight: 800;">-</h2>
+                            <small class="text-muted"><span class="text-success fw-bold">↑ 12%</span> from last month</small>
                         </div>
-                        <div class="bg-primary bg-opacity-10 p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-people" style="font-size: 1.5rem; color: var(--primary);"></i>
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(249, 177, 122, 0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(249, 177, 122, 0.2);">
+                            <i class="bi bi-people-fill" style="font-size: 1.75rem; color: var(--primary);"></i>
                         </div>
                     </div>
                 </div>
@@ -33,16 +30,16 @@
         </div>
 
         <div class="col-sm-6 col-lg-3">
-            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div class="card stat-card stat-responses h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" onclick="new bootstrap.Tab(document.querySelector('#responses-tab')).show()">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="text-muted small mb-1">Total Responses</p>
-                            <h2 class="mb-2" id="statFeedback" style="color: #10b981; font-weight: 700;">-</h2>
-                            <small class="text-muted"><span class="text-success">↑ 8%</span> from last month</small>
+                            <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1" style="letter-spacing: 1px;">Total Responses</p>
+                            <h2 class="mb-2 display-6" id="statFeedback" style="color: #10b981; font-weight: 800;">-</h2>
+                            <small class="text-muted"><span class="text-success fw-bold">↑ 8%</span> from last month</small>
                         </div>
-                        <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(16, 185, 129, 0.1);">
-                            <i class="bi bi-chat-dots" style="font-size: 1.5rem; color: #10b981;"></i>
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);">
+                            <i class="bi bi-chat-dots-fill" style="font-size: 1.75rem; color: #10b981;"></i>
                         </div>
                     </div>
                 </div>
@@ -50,16 +47,16 @@
         </div>
 
         <div class="col-sm-6 col-lg-3">
-            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div class="card stat-card stat-forms h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" onclick="new bootstrap.Tab(document.querySelector('#forms-tab')).show()">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="text-muted small mb-1">Forms Created</p>
-                            <h2 class="mb-2" id="statForms" style="color: #f59e0b; font-weight: 700;">-</h2>
-                            <small class="text-muted"><span class="text-success">↑ 4%</span> from last month</small>
+                            <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1" style="letter-spacing: 1px;">Forms Created</p>
+                            <h2 class="mb-2 display-6" id="statForms" style="color: #0ea5e9; font-weight: 800;">-</h2>
+                            <small class="text-muted"><span class="text-success fw-bold">↑ 4%</span> from last month</small>
                         </div>
-                        <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(245, 158, 11, 0.1);">
-                            <i class="bi bi-file-text" style="font-size: 1.5rem; color: #f59e0b;"></i>
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(14, 165, 233, 0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);">
+                            <i class="bi bi-file-earmark-text-fill" style="font-size: 1.75rem; color: #0ea5e9;"></i>
                         </div>
                     </div>
                 </div>
@@ -67,16 +64,16 @@
         </div>
 
         <div class="col-sm-6 col-lg-3">
-            <div class="card stat-card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div class="card stat-card stat-questions h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" onclick="new bootstrap.Tab(document.querySelector('#forms-tab')).show()">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="text-muted small mb-1">Questions</p>
-                            <h2 class="mb-2" id="statQuestions" style="color: #8b5cf6; font-weight: 700;">-</h2>
-                            <small class="text-muted"><span class="text-success">↑ 2%</span> from last month</small>
+                            <p class="text-muted small fw-bold text-uppercase tracking-wider mb-1" style="letter-spacing: 1px;">Questions</p>
+                            <h2 class="mb-2 display-6" id="statQuestions" style="color: #8b5cf6; font-weight: 800;">-</h2>
+                            <small class="text-muted"><span class="text-success fw-bold">↑ 2%</span> from last month</small>
                         </div>
-                        <div class="p-3 rounded" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: rgba(139, 92, 246, 0.1);">
-                            <i class="bi bi-help-circle" style="font-size: 1.5rem; color: #8b5cf6;"></i>
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(139, 92, 246, 0.15); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);">
+                            <i class="bi bi-patch-question-fill" style="font-size: 1.75rem; color: #8b5cf6;"></i>
                         </div>
                     </div>
                 </div>
@@ -85,28 +82,65 @@
     </div>
 
     <!-- Tabs Navigation -->
-    <ul class="nav nav-tabs mb-4" role="tablist" style="border-bottom: 2px solid #e5e7eb;">
+    <ul class="nav nav-tabs mb-4" role="tablist" style="border-bottom: 2px solid var(--border);">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-600" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: var(--text-dark);">👥 Users</button>
+            <button class="nav-link active fw-600" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" style="color: var(--text-dark);"><i class="bi bi-graph-up me-2"></i>Analytics</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-600" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button" role="tab" style="color: var(--text-dark);">❓ Questions</button>
+            <button class="nav-link fw-600" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" style="color: var(--text-dark);"><i class="bi bi-people me-2"></i>Users</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-600" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab" style="color: var(--text-dark);">📊 Responses</button>
+            <button class="nav-link fw-600" id="forms-tab" data-bs-toggle="tab" data-bs-target="#forms" type="button" role="tab" style="color: var(--text-dark);"><i class="bi bi-file-text me-2"></i>Forms</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-600" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab" style="color: var(--text-dark);"><i class="bi bi-bar-chart me-2"></i>Responses</button>
         </li>
     </ul>
 
     <!-- Tab Content -->
     <div class="tab-content">
+        <!-- Analytics Tab -->
+        <div class="tab-pane fade show active" id="analytics" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: var(--bg-surface);">
+                        <div class="card-body p-4">
+                            <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Activity Overview</h5>
+                            <div style="position: relative; height: 400px; width: 100%;"><canvas id="activityChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: var(--bg-surface);">
+                                <div class="card-body p-4">
+                                    <h5 class="mb-3" style="color: var(--text-dark); font-weight: 600;">User Roles</h5>
+                                    <div style="position: relative; height: 180px; width: 100%;"><canvas id="rolesChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: var(--bg-surface);">
+                                <div class="card-body p-4">
+                                    <h5 class="mb-3" style="color: var(--text-dark); font-weight: 600;">Form Status</h5>
+                                    <div style="position: relative; height: 180px; width: 100%;"><canvas id="statusChart"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Users Tab -->
-        <div class="tab-pane fade show active" id="users" role="tabpanel">
-            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <div class="tab-pane fade" id="users" role="tabpanel">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: var(--bg-surface);">
                 <div class="card-body p-4">
                     <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">User Management</h5>
                     <div class="table-responsive">
-                        <table class="table align-middle" style="color: var(--text-dark);">
-                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                        <table class="table align-middle" style="color: var(--text-dark); --bs-table-bg: transparent; --bs-table-color: var(--text-dark); border-color: var(--border);">
+                            <thead style="background-color: var(--bg-surface-light); border-bottom: 2px solid var(--border);">
                                 <tr>
                                     <th style="color: var(--text-dark); font-weight: 600;">Username</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Email</th>
@@ -124,22 +158,24 @@
             </div>
         </div>
 
-        <!-- Questions Tab -->
-        <div class="tab-pane fade" id="questions" role="tabpanel">
-            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <!-- Forms Tab -->
+        <div class="tab-pane fade" id="forms" role="tabpanel">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: var(--bg-surface);">
                 <div class="card-body p-4">
-                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Survey Questions</h5>
+                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Forms Overview</h5>
                     <div class="table-responsive">
-                        <table class="table align-middle" style="color: var(--text-dark);">
-                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                        <table class="table align-middle" style="color: var(--text-dark); --bs-table-bg: transparent; --bs-table-color: var(--text-dark); border-color: var(--border);">
+                            <thead style="background-color: var(--bg-surface-light); border-bottom: 2px solid var(--border);">
                                 <tr>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Question</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Title</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Creator</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Responses</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Status</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="questionsTable">
-                                <tr><td colspan="3" class="text-center text-muted py-5">Loading questions...</td></tr>
+                            <tbody id="formsTable">
+                                <tr><td colspan="5" class="text-center text-muted py-5">Loading forms...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -149,21 +185,20 @@
 
         <!-- Responses Tab -->
         <div class="tab-pane fade" id="responses" role="tabpanel">
-            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <div class="card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: var(--bg-surface);">
                 <div class="card-body p-4">
-                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Survey Responses</h5>
+                    <h5 class="mb-4" style="color: var(--text-dark); font-weight: 600;">Latest Survey Responses</h5>
                     <div class="table-responsive">
-                        <table class="table align-middle" style="color: var(--text-dark);">
-                            <thead style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                        <table class="table align-middle" style="color: var(--text-dark); --bs-table-bg: transparent; --bs-table-color: var(--text-dark); border-color: var(--border);">
+                            <thead style="background-color: var(--bg-surface-light); border-bottom: 2px solid var(--border);">
                                 <tr>
-                                    <th style="color: var(--text-dark); font-weight: 600;">User</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Question</th>
-                                    <th style="color: var(--text-dark); font-weight: 600;">Response</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Respondent</th>
+                                    <th style="color: var(--text-dark); font-weight: 600;">Form Title</th>
                                     <th style="color: var(--text-dark); font-weight: 600;">Date</th>
                                 </tr>
                             </thead>
                             <tbody id="responsesTable">
-                                <tr><td colspan="4" class="text-center text-muted py-5">Loading responses...</td></tr>
+                                <tr><td colspan="3" class="text-center text-muted py-5">Loading responses...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -172,12 +207,26 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <style>
-    .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card { transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; border-bottom: 3px solid transparent !important; cursor: pointer; }
     .stat-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important; }
+    
+    .stat-users { background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(249, 177, 122, 0.15) 100%) !important; }
+    .stat-users:hover { border-bottom-color: var(--primary) !important; }
+
+    .stat-responses { background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(16, 185, 129, 0.15) 100%) !important; }
+    .stat-responses:hover { border-bottom-color: #10b981 !important; }
+
+    .stat-forms { background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(14, 165, 233, 0.15) 100%) !important; }
+    .stat-forms:hover { border-bottom-color: #0ea5e9 !important; }
+
+    .stat-questions { background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(139, 92, 246, 0.15) 100%) !important; }
+    .stat-questions:hover { border-bottom-color: #8b5cf6 !important; }
+
     .nav-tabs .nav-link { border: none; border-bottom: 3px solid transparent; color: var(--text-muted); transition: all 0.2s; }
     .nav-tabs .nav-link:hover { border-bottom-color: var(--primary); color: var(--primary); }
     .nav-tabs .nav-link.active { border-bottom-color: var(--primary); color: var(--primary); background: none; }
@@ -190,11 +239,60 @@ async function loadStats() {
         const data = await response.json();
         if (data.status === 'success') {
             document.getElementById('statUsers').textContent = data.stats.users || 0;
-            document.getElementById('statFeedback').textContent = data.stats.feedback || 0;
+            document.getElementById('statFeedback').textContent = data.stats.responses || 0;
             document.getElementById('statForms').textContent = data.stats.forms || 0;
             document.getElementById('statQuestions').textContent = data.stats.questions || 0;
         }
     } catch (error) { console.error('Error loading stats:', error); }
+}
+
+
+
+function toggleUser(userId, isActive) {
+    const actionText = isActive ? 'Activate' : 'Deactivate';
+    const theme = isActive ? 'success' : 'warning';
+    showConfirm(
+        `${actionText} User`,
+        `Are you sure you want to ${actionText.toLowerCase()} this user?`,
+        actionText,
+        theme,
+        async () => {
+            const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_active: isActive })
+            });
+            if (response.ok) loadUsers();
+            else alert((await response.json()).message || 'Error updating user');
+        }
+    );
+}
+
+function deleteUser(userId) {
+    showConfirm(
+        'Delete User',
+        'Are you sure you want to permanently delete this user? This action cannot be undone.',
+        'Delete',
+        'danger',
+        async () => {
+            const response = await fetch(`{{ url_for('admin.delete_user', user_id=0) }}`.replace('0', userId), { method: 'DELETE' });
+            if (response.ok) loadUsers();
+            else alert((await response.json()).message || 'Error deleting user');
+        }
+    );
+}
+
+function deleteAdminForm(formId) {
+    showConfirm(
+        'Delete Form',
+        'Are you sure you want to permanently delete this form and all its responses?',
+        'Delete',
+        'danger',
+        async () => {
+            const response = await fetch(`{{ url_for('admin.delete_form', form_id=0) }}`.replace('0', formId), { method: 'DELETE' });
+            if (response.ok) loadForms();
+        }
+    );
 }
 
 async function loadUsers() {
@@ -213,64 +311,218 @@ async function loadUsers() {
         data.users.forEach(user => {
             const statusBadge = user.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
             const roleBadge = user.role === 'admin' ? '<span class="badge bg-primary">Admin</span>' : '<span class="badge bg-secondary">User</span>';
-            const row = `<tr><td><strong>${user.username}</strong></td><td>${user.email}</td><td>${roleBadge}</td><td>${statusBadge}</td><td><button class="btn btn-sm btn-outline-primary">Edit</button></td></tr>`;
+            const actions = `
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1" onclick="toggleUser(${user.id}, ${!user.is_active})" style="border-radius: 6px;">
+                        <i class="bi bi-${user.is_active ? 'power' : 'check2-circle'}"></i> ${user.is_active ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" onclick="deleteUser(${user.id})" style="border-radius: 6px;">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            const row = `<tr><td><strong>${user.username}</strong></td><td>${user.email}</td><td>${roleBadge}</td><td>${statusBadge}</td><td>${actions}</td></tr>`;
             tbody.innerHTML += row;
         });
     } catch (error) { console.error('Error loading users:', error); }
 }
 
-async function loadQuestions() {
+async function loadForms() {
     try {
-        const response = await fetch('{{ url_for("feedback.get_overall_questions") }}');
+        const response = await fetch('{{ url_for("admin.get_forms") }}');
         const data = await response.json();
         if (data.status !== 'success') return;
         
-        const tbody = document.getElementById('questionsTable');
+        const tbody = document.getElementById('formsTable');
         tbody.innerHTML = '';
-        if (!data.questions || data.questions.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-5">No questions found</td></tr>';
+        if (!data.forms || data.forms.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-5">No forms found</td></tr>';
             return;
         }
         
-        data.questions.forEach(q => {
-            const row = `<tr><td><strong>${q.text}</strong></td><td><span class="badge bg-info">View</span></td><td><button class="btn btn-sm btn-outline-danger">Delete</button></td></tr>`;
+        data.forms.forEach(f => {
+            const statusBadge = f.is_published ? '<span class="badge bg-success">Published</span>' : '<span class="badge bg-warning">Draft</span>';
+            const row = `<tr>
+                <td><strong>${f.title}</strong><br><small class="text-muted">${f.public_id}</small></td>
+                <td>${f.creator_username}</td>
+                <td><span class="badge bg-info">${f.response_count}</span></td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" onclick="deleteAdminForm(${f.id})" style="border-radius: 6px;">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>`;
             tbody.innerHTML += row;
         });
-    } catch (error) { console.error('Error loading questions:', error); }
+    } catch (error) { console.error('Error loading forms:', error); }
 }
 
 async function loadResponses() {
     try {
-        const response = await fetch('{{ url_for("feedback.menu_summaries") }}');
+        const response = await fetch('{{ url_for("admin.get_responses") }}');
         const data = await response.json();
         if (data.status !== 'success') return;
         
         const tbody = document.getElementById('responsesTable');
         tbody.innerHTML = '';
-        if (!data.items || data.items.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-5">No responses yet</td></tr>';
+        if (!data.responses || data.responses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-5">No responses yet</td></tr>';
             return;
         }
         
-        let count = 0;
-        data.items.forEach(item => {
-            for (let i = 0; i < item.response_count; i++) {
-                count++;
-                const row = `<tr><td><span class="badge bg-secondary">User ${count}</span></td><td>Survey Question</td><td><small>Comment</small></td><td>${new Date().toLocaleDateString()}</td></tr>`;
-                tbody.innerHTML += row;
-            }
+        data.responses.forEach(r => {
+            const date = new Date(r.submitted_at).toLocaleDateString() + ' ' + new Date(r.submitted_at).toLocaleTimeString();
+            const row = `<tr>
+                <td><strong>${r.respondent}</strong></td>
+                <td>${r.form_title}</td>
+                <td><small class="text-muted">${date}</small></td>
+            </tr>`;
+            tbody.innerHTML += row;
         });
     } catch (error) { console.error('Error loading responses:', error); }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
+    loadAnalytics();
     loadUsers();
-    loadQuestions();
+    loadForms();
     loadResponses();
+    document.getElementById('analytics-tab').addEventListener('shown.bs.tab', loadAnalytics);
     document.getElementById('users-tab').addEventListener('shown.bs.tab', loadUsers);
-    document.getElementById('questions-tab').addEventListener('shown.bs.tab', loadQuestions);
+    document.getElementById('forms-tab').addEventListener('shown.bs.tab', loadForms);
     document.getElementById('responses-tab').addEventListener('shown.bs.tab', loadResponses);
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let chartsLoaded = false;
+async function loadAnalytics() {
+    if (chartsLoaded) return;
+    try {
+        const [usersRes, formsRes, responsesRes] = await Promise.all([
+            fetch('{{ url_for("admin.get_users") }}'),
+            fetch('{{ url_for("admin.get_forms") }}'),
+            fetch('{{ url_for("admin.get_responses") }}')
+        ]);
+        const usersData = await usersRes.json();
+        const formsData = await formsRes.json();
+        const responsesData = await responsesRes.json();
+        
+        if (usersData.status !== 'success' || formsData.status !== 'success' || responsesData.status !== 'success') return;
+        
+        renderCharts(usersData.users, formsData.forms, responsesData.responses);
+        chartsLoaded = true;
+    } catch (e) {
+        console.error('Error loading analytics', e);
+    }
+}
+
+function renderCharts(users, forms, responses) {
+    Chart.defaults.color = '#9CA3AF';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+    
+    // Roles Chart
+    const rolesCtx = document.getElementById('rolesChart').getContext('2d');
+    const adminCount = users.filter(u => u.role === 'admin').length;
+    const userCount = users.length - adminCount;
+    new Chart(rolesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Admin', 'User'],
+            datasets: [{
+                data: [adminCount, userCount],
+                backgroundColor: ['#7C3AED', '#FF9B50'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+    });
+
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const pubCount = forms.filter(f => f.is_published).length;
+    const draftCount = forms.length - pubCount;
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Published', 'Draft'],
+            datasets: [{
+                data: [pubCount, draftCount],
+                backgroundColor: ['#10B981', '#F59E0B'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+    });
+
+    // Activity Chart (Last 7 Days)
+    const activityCtx = document.getElementById('activityChart').getContext('2d');
+    
+    const dates = [];
+    const formsByDate = {};
+    const responsesByDate = {};
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        dates.push(dateStr);
+        formsByDate[dateStr] = 0;
+        responsesByDate[dateStr] = 0;
+    }
+
+    forms.forEach(f => {
+        const dateStr = f.created_at.split('T')[0];
+        if (formsByDate[dateStr] !== undefined) formsByDate[dateStr]++;
+    });
+    
+    responses.forEach(r => {
+        const dateStr = r.submitted_at.split('T')[0];
+        if (responsesByDate[dateStr] !== undefined) responsesByDate[dateStr]++;
+    });
+
+    const displayDates = dates.map(d => {
+        const p = d.split('-');
+        return `${p[1]}/${p[2]}`;
+    });
+
+    new Chart(activityCtx, {
+        type: 'line',
+        data: {
+            labels: displayDates,
+            datasets: [
+                {
+                    label: 'New Forms',
+                    data: dates.map(d => formsByDate[d]),
+                    borderColor: '#0EA5E9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Responses',
+                    data: dates.map(d => responsesByDate[d]),
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { labels: { color: '#fff' } } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1, color: '#9CA3AF' } },
+                x: { ticks: { color: '#9CA3AF' } }
+            }
+        }
+    });
+}
 </script>
 {% endblock %}

@@ -28,6 +28,7 @@ def dashboard():
 @admin_bp.route('/api/stats', methods=['GET'])
 @admin_required
 def get_stats():
+    from models import FormQuestion
     return jsonify(
         {
             'status': 'success',
@@ -35,8 +36,7 @@ def get_stats():
                 'users': User.query.count(),
                 'forms': Form.query.count(),
                 'responses': FormResponse.query.count(),
-                'feedback': Feedback.query.count(),
-                'questions': Question.query.count(),
+                'questions': FormQuestion.query.count(),
             },
         }
     )

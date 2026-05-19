@@ -4,58 +4,57 @@
 
 {% block content %}
 <div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-    <div class="row w-100">
-        <div class="col-md-5 col-lg-4 mx-auto">
-            <!-- Register Card -->
-            <div class="card" style="border: none; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
-                <div class="card-body p-5">
-                    <!-- Header -->
-                    <div class="text-center mb-4">
-                        <h2 class="mb-2" style="color: var(--text-dark); font-weight: 700;">Create Account</h2>
-                        <p class="text-muted small">Join Balitech and create surveys</p>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <!-- Register Form -->
-                    <form id="registerForm">
-                        <div class="mb-3">
-                            <label for="username" class="form-label fw-500" style="color: var(--text-dark);">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required style="border-color: #e5e7eb;">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label fw-500" style="color: var(--text-dark);">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required style="border-color: #e5e7eb;">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="password" class="form-label fw-500" style="color: var(--text-dark);">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required style="border-color: #e5e7eb;">
-                            <small class="text-muted">Minimum 6 characters</small>
-                        </div>
-                        
-                        <!-- Alerts -->
-                        <div id="alertContainer" class="mb-3"></div>
-                        
-                        <!-- Register Button -->
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success btn-lg fw-600">Create Account</button>
-                        </div>
-                    </form>
-
-                    <hr class="my-4">
-
-                    <!-- Footer -->
-                    <div class="text-center">
-                        <p class="text-muted mb-2">Already have an account?</p>
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm w-100">Sign In</a>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <a href="{{ url_for('forms.list_public_forms') }}" class="text-muted text-decoration-none small">← Back to Forms</a>
-                    </div>
+    <div class="card overflow-hidden" style="border: none; box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-width: 1000px; width: 100%; border-radius: 16px;">
+        <div class="row g-0">
+            <!-- Form Side -->
+            <div class="col-md-6 p-4 p-lg-5 d-flex flex-column justify-content-center">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h2 class="mb-2" style="color: var(--text-dark); font-weight: 700;">Create Account</h2>
+                    <p class="text-muted small">Join Balitech and create surveys</p>
                 </div>
+
+                <hr class="my-4">
+
+                <!-- Register Form -->
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-500" style="color: var(--text-dark);">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required style="border-color: #e5e7eb;">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-500" style="color: var(--text-dark);">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required style="border-color: #e5e7eb;">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-500" style="color: var(--text-dark);">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required style="border-color: #e5e7eb;">
+                        <small class="text-muted">Minimum 6 characters</small>
+                    </div>
+                    
+                    <!-- Alerts -->
+                    <div id="alertContainer" class="mb-3"></div>
+                    
+                    <!-- Register Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg fw-600">Create Account</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- Footer -->
+                <div class="text-center">
+                    <p class="text-muted mb-2">Already have an account?</p>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-sm w-100 mb-3">Sign In</a>
+                    <a href="{{ url_for('forms.list_public_forms') }}" class="text-muted text-decoration-none small">← Back to Forms</a>
+                </div>
+            </div>
+            
+            <!-- Image Side -->
+            <div class="col-md-6 d-none d-md-block" style="background-image: url('{{ url_for('static', filename='img/login_bg.png') }}'); background-size: cover; background-position: center; min-height: 500px;">
             </div>
         </div>
     </div>

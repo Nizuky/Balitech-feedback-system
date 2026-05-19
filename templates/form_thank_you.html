@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Thank You - Balitech{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card text-center" style="border: none; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                            ✓
+                        </div>
+                    </div>
+                    
+                    <h1 class="mb-3" style="color: var(--text-dark); font-weight: 700;">Thank You!</h1>
+                    <p class="text-muted mb-4" style="font-size: 1.1rem;">
+                        Your response to <strong>{{ form.title }}</strong> has been successfully recorded.
+                    </p>
+
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a href="{{ url_for('forms.list_public_forms') }}" class="btn btn-primary btn-lg px-4">Browse More Forms</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
