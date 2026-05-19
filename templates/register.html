@@ -39,9 +39,6 @@
                         <small class="text-muted">Minimum 6 characters</small>
                     </div>
                     
-                    <!-- Alerts -->
-                    <div id="alertContainer" class="mb-3"></div>
-                    
                     <!-- Register Button -->
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg fw-600">Create Account</button>
@@ -101,30 +98,16 @@
             const data = await response.json();
             
             if (response.ok) {
-                alertContainer.innerHTML = `
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        Account created successfully! Redirecting to login...
-                    </div>
-                `;
+                showToast('Success', 'Account created successfully! Redirecting to login...', 'success');
                 setTimeout(() => {
                     window.location.href = '{{ url_for("auth.login") }}';
                 }, 1500);
             } else {
                 const errorMessage = data.message || 'Registration failed. Please try again.';
-                alertContainer.innerHTML = `
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>Error!</strong> ${errorMessage}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
+                showToast('Error', errorMessage, 'danger');
             }
         } catch (error) {
-            alertContainer.innerHTML = `
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Error!</strong> ${error.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
+            showToast('Error', error.message || 'An unexpected error occurred.', 'danger');
         }
     });
 </script>
