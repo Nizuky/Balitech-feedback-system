@@ -257,13 +257,22 @@ function toggleUser(userId, isActive) {
         actionText,
         theme,
         async () => {
-            const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ is_active: isActive })
-            });
-            if (response.ok) loadUsers();
-            else alert((await response.json()).message || 'Error updating user');
+            try {
+                const response = await fetch(`{{ url_for('admin.update_user', user_id=0) }}`.replace('0', userId), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_active: isActive })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    loadUsers();
+                    showToast('Success', `User account has been successfully ${isActive ? 'activated' : 'deactivated'}.`, 'success');
+                } else {
+                    showToast('Error', data.message || 'Error updating user', 'danger');
+                }
+            } catch (err) {
+                showToast('Error', 'An unexpected network error occurred.', 'danger');
+            }
         }
     );
 }
@@ -275,9 +284,18 @@ function deleteUser(userId) {
         'Delete',
         'danger',
         async () => {
-            const response = await fetch(`{{ url_for('admin.delete_user', user_id=0) }}`.replace('0', userId), { method: 'DELETE' });
-            if (response.ok) loadUsers();
-            else alert((await response.json()).message || 'Error deleting user');
+            try {
+                const response = await fetch(`{{ url_for('admin.delete_user', user_id=0) }}`.replace('0', userId), { method: 'DELETE' });
+                const data = await response.json();
+                if (response.ok) {
+                    loadUsers();
+                    showToast('Success', 'User has been successfully deleted.', 'success');
+                } else {
+                    showToast('Error', data.message || 'Error deleting user', 'danger');
+                }
+            } catch (err) {
+                showToast('Error', 'An unexpected network error occurred.', 'danger');
+            }
         }
     );
 }

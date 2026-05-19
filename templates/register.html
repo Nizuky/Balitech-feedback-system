@@ -30,7 +30,12 @@
                     
                     <div class="mb-4">
                         <label for="password" class="form-label fw-500" style="color: var(--text-dark);">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required style="border-color: #e5e7eb;">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required style="border-color: #e5e7eb; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                            <button class="btn" type="button" id="togglePassword" style="border: 1px solid #e5e7eb; border-left: none; border-top-right-radius: 8px; border-bottom-right-radius: 8px; background: transparent; color: var(--text-muted);">
+                                <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
                         <small class="text-muted">Minimum 6 characters</small>
                     </div>
                     
@@ -64,6 +69,20 @@
 
 {% block extra_js %}
 <script>
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = document.getElementById('togglePasswordIcon');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    });
+
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         

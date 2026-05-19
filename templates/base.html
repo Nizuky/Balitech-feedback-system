@@ -217,6 +217,83 @@
             box-shadow: 0 4px 15px rgba(255, 155, 80, 0.3);
         }
         .btn-nav-cta i { margin-left: 6px; font-size: 1rem; }
+
+        /* Toast Container */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .custom-toast {
+            min-width: 300px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.35s ease;
+            opacity: 0;
+        }
+
+        .custom-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .custom-toast-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .custom-toast-success .custom-toast-icon { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .custom-toast-danger .custom-toast-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .custom-toast-warning .custom-toast-icon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .custom-toast-info .custom-toast-icon { background: rgba(14, 165, 233, 0.15); color: #0ea5e9; }
+
+        .custom-toast-content {
+            flex-grow: 1;
+        }
+
+        .custom-toast-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .custom-toast-message {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .custom-toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .custom-toast-close:hover {
+            color: #ffffff;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -353,6 +430,49 @@
 
             _gcmAction = callback || null;
             _gcmModal.show();
+        };
+
+        window.showToast = function(title, message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast custom-toast-${type}`;
+            toast.innerHTML = `
+                <div class="custom-toast-icon">
+                    <i class="bi ${icons[type] || 'bi-info-circle-fill'}"></i>
+                </div>
+                <div class="custom-toast-content">
+                    <div class="custom-toast-title">${title}</div>
+                    <div class="custom-toast-message">${message}</div>
+                </div>
+                <button class="custom-toast-close" onclick="this.parentElement.remove()">
+                    <i class="bi bi-x"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger reflow
+            toast.offsetHeight;
+            toast.classList.add('show');
+
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 350);
+            }, 4000);
         };
 
         document.addEventListener('DOMContentLoaded', () => {

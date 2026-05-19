@@ -89,7 +89,7 @@ class Form(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     tag = db.Column(db.String(255), nullable=True)
 
-    creator = db.relationship('User', backref=db.backref('created_forms', lazy=True))
+    creator = db.relationship('User', backref=db.backref('created_forms', lazy=True, cascade='all, delete-orphan'))
     questions = db.relationship('FormQuestion', backref='form', lazy=True, cascade='all, delete-orphan', order_by='FormQuestion.position')
     responses = db.relationship('FormResponse', backref='form', lazy=True, cascade='all, delete-orphan')
 
@@ -136,7 +136,7 @@ class FormResponse(db.Model):
     respondent_name = db.Column(db.String(120), nullable=True)
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    respondent_user = db.relationship('User', backref=db.backref('submitted_form_responses', lazy=True), foreign_keys=[respondent_user_id])
+    respondent_user = db.relationship('User', backref=db.backref('submitted_form_responses', lazy=True, cascade='all, delete-orphan'), foreign_keys=[respondent_user_id])
     answers = db.relationship('FormAnswer', backref='response', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
