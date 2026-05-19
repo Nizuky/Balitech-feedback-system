@@ -66,8 +66,9 @@
                         </div>
                         {% endfor %}
 
-                        <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg fw-600">Submit Response</button>
+                        <div class="d-flex gap-3 mt-5">
+                            <a href="{{ url_for('forms.list_public_forms') }}" class="btn w-50 btn-lg fw-600" style="border: 1px solid var(--border); color: var(--text-dark); border-radius: 8px;">Cancel</a>
+                            <button type="submit" class="btn btn-primary btn-lg fw-600 w-50">Submit Response</button>
                         </div>
                     </form>
                 </div>
